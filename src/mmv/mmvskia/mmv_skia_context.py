@@ -36,10 +36,10 @@ import os
 # that class also changes some configurations here, this is motly
 # shared stuff across files and it's a bit hard to keep track of them all
 class MMVContext:
-    def __init__(self, mmv_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmv_skia_main, depth = LOG_NO_DEPTH) -> None:
         debug_prefix = "[MMVContext.__init__]"
         ndepth = depth + LOG_NEXT_DEPTH
-        self.mmv_main = mmv_main
+        self.mmv_skia_main = mmv_skia_main
 
         # Files, info
         self.output_video = None

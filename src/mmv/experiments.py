@@ -50,7 +50,7 @@ class Experiments:
 
         if experiment == "sample_sorter":
             sorter = SampleSorter(
-                mmv = self.processing.mmv_main,
+                mmv = self.processing.mmv_skia_main,
                 path = "/some/path",
             )
         
@@ -62,13 +62,13 @@ class Experiments:
         #
         #     for i in range(20):
         #         render = PyGLSLRender(
-        #             mmv = self.processing.mmv_main,
+        #             mmv = self.processing.mmv_skia_main,
         #             width = width,
         #             height = height,
         #             fragment_shader = self.THIS_FILE_DIR + "/mmv/shaders/fragment/cardioid-pulse.frag",
         #             output = self.THIS_FILE_DIR + f"/out-{i}.mkv",
         #
-        #             extra_paths_find_glslviewer = [self.processing.mmv_main.context.externals, self.THIS_FILE_DIR],
+        #             extra_paths_find_glslviewer = [self.processing.mmv_skia_main.context.externals, self.THIS_FILE_DIR],
         #
         #             mode = "video",
         #             video_fps = 60,
@@ -107,7 +107,7 @@ class Experiments:
 
             # Get a pygradienter object
             pygradienter = PyGradienter(
-                mmv = self.processing.mmv_main,
+                mmv = self.processing.mmv_skia_main,
                 skia = skia,
                 width = width,
                 height = height,
@@ -121,7 +121,7 @@ class Experiments:
         elif experiment == "release":
             self.processing.download_check_ffmpeg(making_release = True)
             mk = MakeRelease(
-                mmv = self.processing.mmv_main,
+                mmv = self.processing.mmv_skia_main,
                 project_root = self.THIS_FILE_DIR,
                 mmv_folder = self.THIS_FILE_DIR + "/mmv",
                 **self.args.kflags,

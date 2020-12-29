@@ -46,9 +46,9 @@ class MMVShaderInterface:
     # and functionality.
     #
     # We create a MMV{Skia,Shader}Main class and we send this interface to it, and we send that instance
-    # of MMV*Main to every other sub class so if we access self.mmv_main.interface we are accessing this
+    # of MMV*Main to every other sub class so if we access self.mmv_skia_main.interface we are accessing this
     # file here, MMVShaderInterface, and we can quickly refer to the most top level package by doing
-    # self.mmv_main.interface.top_level_interface, since this interface here is just the MMVSkia 
+    # self.mmv_skia_main.interface.top_level_interface, since this interface here is just the MMVSkia 
     # interface for the mmvshader package while the top level one manages both MMVSkia and MMVShader
     #
     def __init__(self, top_level_interace, depth = LOG_NO_DEPTH, **kwargs):
@@ -58,7 +58,7 @@ class MMVShaderInterface:
         self.os = self.top_level_interace.os
   
         # Where this file is located, please refer using this on the whole package
-        # Refer to it as self.mmv_main.interface.MMV_SHADER_ROOT at any depth in the code
+        # Refer to it as self.mmv_skia_main.interface.MMV_SHADER_ROOT at any depth in the code
         # This deals with the case we used pyinstaller and it'll get the executable path instead
         if getattr(sys, 'frozen', True):    
             self.MMV_SHADER_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -95,8 +95,8 @@ class MMVShaderInterface:
     # List the shaders on the self.SHADERS_LOCATED_AT folder and also
     # reads every shader for pattern matching and printing available
     # options / settings
-    def list_shaders(self, depth = LOG_NEXT_DEPTH):
-        debug_prefix = "[list_shaders]"
+    def list_mpv_shaders(self, depth = LOG_NEXT_DEPTH):
+        debug_prefix = "[MMVShaderInterface.list_mpv_shaders]"
         logging.info(f"{depth}{debug_prefix} Listing shader paths and documentation")
         logging.info(STEP_SEPARATOR)
         depth = depth + LOG_NEXT_DEPTH

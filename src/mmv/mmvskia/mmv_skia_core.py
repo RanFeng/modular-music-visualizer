@@ -63,8 +63,8 @@ class MMVSkiaCore:
         logging.info(f"{depth}{debug_prefix} Saving partial session info to last_session_info file at [{last_session_info_file}]")
 
         # Quit if code flow says so
-        if self.prelude["flow"]["stop_at_mmv_core_run"]:
-            logging.critical(f"{ndepth}{debug_prefix} Not continuing because stop_at_mmv_core_run key on prelude.toml is True")
+        if self.prelude["flow"]["stop_at_mmv_skia_core_run"]:
+            logging.critical(f"{ndepth}{debug_prefix} Not continuing because stop_at_mmv_skia_core_run key on prelude.toml is True")
             sys.exit(0)
 
         # Don't write any videos, just process the audio (useful for debugging)
@@ -291,7 +291,7 @@ class MMVSkiaCore:
                 # Process next animation with audio info and the step count to process on
                 if LOG_NEXT_STEPS:
                     logging.debug(f"{depth}{debug_prefix} Call MMVSkiaAnimation.next()")
-                self.mmvskia_main.mmv_animation.next()
+                self.mmvskia_main.mmv_skia_animation.next()
 
                 # Next image to pipe
                 if LOG_NEXT_STEPS:

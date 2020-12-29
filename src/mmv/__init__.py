@@ -157,7 +157,7 @@ f"""{depth}{debug_prefix} Show thanks message
         sep = os.path.sep
 
         # Where this file is located, please refer using this on the whole package
-        # Refer to it as self.mmv_main.MMV_INTERFACE_ROOT at any depth in the code
+        # Refer to it as self.mmv_skia_main.MMV_INTERFACE_ROOT at any depth in the code
         # This deals with the case we used pyinstaller and it'll get the executable path instead
         if getattr(sys, 'frozen', True):    
             self.MMV_INTERFACE_ROOT = os.path.dirname(os.path.abspath(__file__))

@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.generators.mmv_particle_generator import MMVSkiaParticleGenerator
+from mmv.mmvskia.generators.mmv_skia_particle_generator import MMVSkiaParticleGenerator
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
 import logging
 

@@ -27,8 +27,8 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
-from mmv.mmvskia.mmv_generator import *
-from mmv.mmvskia.mmv_modifiers import *
+from mmv.mmvskia.mmv_skia_generator import *
+from mmv.mmvskia.mmv_skia_modifiers import *
 import logging
 import random
 import copy
@@ -40,11 +40,11 @@ import os
 class MMVSkiaAnimation:
 
     # Initialize a MMVSkiaAnimation class with required arguments
-    def __init__(self, mmv_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmv_skia_main, depth = LOG_NO_DEPTH) -> None:
         debug_prefix = "[MMVSkiaAnimation.__init__]"
         ndepth = depth + LOG_NEXT_DEPTH
-        self.mmv_main = mmv_main
-        self.preludec = self.mmv_main.prelude["mmvanimation"]
+        self.mmv_skia_main = mmv_skia_main
+        self.preludec = self.mmv_skia_main.prelude["mmvanimation"]
 
         # Log we started
         if self.preludec["log_creation"]:
@@ -130,4 +130,4 @@ class MMVSkiaAnimation:
                 del self.content[ layer_index ][ items ]
 
         # Post process this final frame as we added all the items
-        self.mmv_main.canvas.next()
+        self.mmv_skia_main.canvas.next()

@@ -26,8 +26,8 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.progression_bars.mmv_progression_bar_rectangle import MMVSkiaProgressionBarRectangle
-from mmv.mmvskia.mmv_modifiers import *
+from mmv.mmvskia.progression_bars.mmv_skia_progression_bar_rectangle import MMVSkiaProgressionBarRectangle
+from mmv.mmvskia.mmv_skia_modifiers import *
 from mmv.common.cmn_frame import Frame
 from mmv.common.cmn_utils import Utils
 import random

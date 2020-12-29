@@ -27,10 +27,10 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
+from mmv.mmvskia.mmv_skia_interpolation import MMVSkiaInterpolation
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
-from mmv.mmvskia.mmv_interpolation import MMVSkiaInterpolation
-from mmv.mmvskia.mmv_vectorial import MMVSkiaVectorial
-from mmv.mmvskia.mmv_modifiers import *
+from mmv.mmvskia.mmv_skia_vectorial import MMVSkiaVectorial
+from mmv.mmvskia.mmv_skia_modifiers import *
 import logging
 import math
 import sys

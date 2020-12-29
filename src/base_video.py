@@ -54,9 +54,9 @@ from mmv.mmvskia.pyskt.pyskt_backend import SkiaNoWindowBackend
 # For auto naming files according to when you run MMV
 import datetime
 
-# For us to refer relative paths to this example_basic.py
+# For us to refer relative paths to this base_video.py
 # THIS_FILE_DIR = path directory of where this file is located without the last "/"
-# It is assumed this file is under /repository_folder/mmv/example_basic.py so 
+# It is assumed this file is under /repository_folder/src/base_video.py so 
 # THIS_FILE_DIR is "/repository_folder/mmv"
 import os
 THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -68,7 +68,7 @@ interface = mmv.MMVInterface()
 processing = interface.get_skia_interface()
 
 # Configure stuff
-processing.configure_mmv_main(
+processing.configure_mmv_skia_main(
 
     # # MMV settings
 
@@ -218,6 +218,7 @@ if MODE == "music":
     # User defined background or MMV-generated one? "user", "generated"
     # Only applied for BACKGROUND_TYPE = "image"
     BACKGROUND_MODE = "generated"
+    # BACKGROUND_MODE = "user"
 
     # Image background
     if BACKGROUND_TYPE == "image":
@@ -376,7 +377,7 @@ if OUTPUT_VIDEO == "auto":
         RENDER_DIR + "/"
         f"mmv_{date_and_time}_"
         f"mode-{MODE}_"
-        f"fps-{processing.mmv_main.context.fps}_"
+        f"fps-{processing.mmv_skia_main.context.fps}_"
         f"{os.path.splitext(os.path.basename(INPUT_AUDIO))[0]}"  # Filename of the audio without extension
         ".mkv"
     )
@@ -725,7 +726,7 @@ if (MODE == "music") and VISUALIZER:
 if PARTICLES:
     generator = processing.generator_object()
 
-    # See "./mmv/mmv/generators/mmv_particle_generator.py" for configuration, we use the default one here
+    # See "./mmv/mmv/generators/mmv_skia_particle_generator.py" for configuration, we use the default one here
     generator.particle_generator(
         preset = PARTICLES_PRESET,
         particles_images_directory = PARTICLES_DIRECTORY,

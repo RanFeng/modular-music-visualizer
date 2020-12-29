@@ -29,11 +29,11 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 print("[mmvskia.__init__.py package] Importing MMV package files, this might take a while from time to time..")
 
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, PACKAGE_DEPTH, LOG_NO_DEPTH, LOG_SEPARATOR, STEP_SEPARATOR
+from mmv.mmvskia.mmv_skia_generator import MMVSkiaGenerator
 from mmv.mmvskia.pygradienter.pyg_main import PyGradienter
-from mmv.mmvskia.mmv_generator import MMVSkiaGenerator
-from mmv.mmvskia.mmv_image import MMVSkiaImage
+from mmv.mmvskia.mmv_skia_image import MMVSkiaImage
 print("[mmvskia.__init__.py package] Importing probably heaviest dependency [MMVSkiaMain], Skia might take a bit to load so does numpy, opencv etc..")
-from mmv.mmvskia.mmv_main import MMVSkiaMain
+from mmv.mmvskia.mmv_skia_main import MMVSkiaMain
 from mmv.common.cmn_midi import MidiFile
 from mmv.common.cmn_utils import Utils
 import subprocess
@@ -58,9 +58,9 @@ class MMVSkiaInterface:
     # and functionality.
     #
     # We create a MMV{Skia,Shader}Main class and we send this interface to it, and we send that instance
-    # of MMV*Main to every other sub class so if we access self.mmv_main.mmvskia_interface we are accessing this
+    # of MMV*Main to every other sub class so if we access self.mmv_skia_main.mmvskia_interface we are accessing this
     # file here, MMVSkiaInterface, and we can quickly refer to the most top level package by doing
-    # self.mmv_main.mmvskia_interface.top_level_interface, since this interface here is just the MMVSkia 
+    # self.mmv_skia_main.mmvskia_interface.top_level_interface, since this interface here is just the MMVSkia 
     # interface for the mmvskia package while the top level one manages both MMVSkia and MMVShader
     #
     def __init__(self, top_level_interace, depth = LOG_NO_DEPTH, **kwargs):
@@ -70,7 +70,7 @@ class MMVSkiaInterface:
         self.os = self.top_level_interace.os
 
         # Where this file is located, please refer using this on the whole package
-        # Refer to it as self.mmv_main.mmvskia_interface.MMV_SKIA_ROOT at any depth in the code
+        # Refer to it as self.mmv_skia_main.mmvskia_interface.MMV_SKIA_ROOT at any depth in the code
         # This deals with the case we used pyinstaller and it'll get the executable path instead
         if getattr(sys, 'frozen', True):    
             self.MMV_SKIA_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -95,21 +95,21 @@ class MMVSkiaInterface:
         # # # Create MMV classes and stuff
 
         # Main class of MMV and tart MMV classes that main connects them, do not run
-        self.mmv_main = MMVSkiaMain(interface = self)
-        self.mmv_main.setup(depth = ndepth)
+        self.mmv_skia_main = MMVSkiaMain(interface = self)
+        self.mmv_skia_main.setup(depth = ndepth)
 
         # Utilities
         self.utils = Utils()
 
         # Configuring options
         self.audio_processing = AudioProcessingPresets(self)
-        self.post_processing = self.mmv_main.canvas.configure
+        self.post_processing = self.mmv_skia_main.canvas.configure
 
         # Log a separator to mark the end of the __init__ phase
         logging.info(f"{depth}{debug_prefix} Initialize phase done!")
         logging.info(LOG_SEPARATOR)
 
-        self.configure_mmv_main()
+        self.configure_mmv_skia_main()
 
         # Quit if code flow says so
         if self.prelude["flow"]["stop_at_interface_init"]:
@@ -117,27 +117,27 @@ class MMVSkiaInterface:
             sys.exit(0)
 
     # Read the function body for more info
-    def configure_mmv_main(self, **kwargs):
+    def configure_mmv_skia_main(self, **kwargs):
 
         # Has the user chosen to watch the processing video realtime?
-        self.mmv_main.context.audio_amplitude_multiplier = kwargs.get("audio_amplitude_multiplier", 1)
-        self.mmv_main.context.skia_render_backend = kwargs.get("render_backend", "gpu")
+        self.mmv_skia_main.context.audio_amplitude_multiplier = kwargs.get("audio_amplitude_multiplier", 1)
+        self.mmv_skia_main.context.skia_render_backend = kwargs.get("render_backend", "gpu")
 
         # # Encoding options
 
         # FFmpeg
-        self.mmv_main.context.ffmpeg_pixel_format = kwargs.get("ffmpeg_pixel_format", "auto")
-        self.mmv_main.context.ffmpeg_dumb_player = kwargs.get("ffmpeg_dumb_player", "auto")
-        self.mmv_main.context.ffmpeg_hwaccel = kwargs.get("ffmpeg_hwaccel", "auto")
+        self.mmv_skia_main.context.ffmpeg_pixel_format = kwargs.get("ffmpeg_pixel_format", "auto")
+        self.mmv_skia_main.context.ffmpeg_dumb_player = kwargs.get("ffmpeg_dumb_player", "auto")
+        self.mmv_skia_main.context.ffmpeg_hwaccel = kwargs.get("ffmpeg_hwaccel", "auto")
 
         # x264 specific
-        self.mmv_main.context.x264_use_opencl = kwargs.get("x264_use_opencl", False)
-        self.mmv_main.context.x264_preset = kwargs.get("x264_preset", "slow")
-        self.mmv_main.context.x264_tune = kwargs.get("x264_tune", "film")
-        self.mmv_main.context.x264_crf = kwargs.get("x264_crf", "17")
+        self.mmv_skia_main.context.x264_use_opencl = kwargs.get("x264_use_opencl", False)
+        self.mmv_skia_main.context.x264_preset = kwargs.get("x264_preset", "slow")
+        self.mmv_skia_main.context.x264_tune = kwargs.get("x264_tune", "film")
+        self.mmv_skia_main.context.x264_crf = kwargs.get("x264_crf", "17")
 
         # Pipe writer
-        self.mmv_main.context.max_images_on_pipe_buffer = kwargs.get("max_images_on_pipe_buffer", 20)
+        self.mmv_skia_main.context.max_images_on_pipe_buffer = kwargs.get("max_images_on_pipe_buffer", 20)
 
     # Execute MMV with the configurations we've done
     def run(self, depth = PACKAGE_DEPTH) -> None:
@@ -148,8 +148,8 @@ class MMVSkiaInterface:
         # Log action
         logging.info(f"{depth}{debug_prefix} Configuration phase done, executing MMVSkiaMain.run()..")
 
-        # Run configured mmv_main class
-        self.mmv_main.run(depth = ndepth)
+        # Run configured mmv_skia_main class
+        self.mmv_skia_main.run(depth = ndepth)
 
     # Define output video width, height and frames per second, defaults to 720p60
     def quality(self, width: int = 1280, height: int = 720, fps: int = 60, batch_size = 2048, depth = PACKAGE_DEPTH) -> None:
@@ -159,17 +159,17 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Setting width={width} height={height} fps={fps} batch_size={batch_size}")
         
         # Assign values
-        self.mmv_main.context.width = width
-        self.mmv_main.context.height = height
-        self.mmv_main.context.fps = fps
-        self.mmv_main.context.batch_size = batch_size
+        self.mmv_skia_main.context.width = width
+        self.mmv_skia_main.context.height = height
+        self.mmv_skia_main.context.fps = fps
+        self.mmv_skia_main.context.batch_size = batch_size
         self.width = width
         self.height = height
         self.resolution = [width, height]
 
         # Create or reset a mmv canvas with that target resolution
         logging.info(f"{depth}{debug_prefix} Creating / resetting canvas with that width and height")
-        self.mmv_main.canvas.create_canvas(depth = ndepth)
+        self.mmv_skia_main.canvas.create_canvas(depth = ndepth)
         logging.info(STEP_SEPARATOR)
 
     # Set the input audio file, raise exception if it does not exist
@@ -179,7 +179,7 @@ class MMVSkiaInterface:
 
         # Log action, do action
         logging.info(f"{depth}{debug_prefix} Set audio file path: [{path}], getting absolute path..")
-        self.mmv_main.context.input_audio_file = self.get_absolute_path(path, depth = ndepth)
+        self.mmv_skia_main.context.input_audio_file = self.get_absolute_path(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
     
     # Set the input audio file, raise exception if it does not exist
@@ -189,7 +189,7 @@ class MMVSkiaInterface:
 
         # Log action, do action
         logging.info(f"{depth}{debug_prefix} Set MIDI file path: [{path}], getting absolute path..")
-        self.mmv_main.context.input_midi = self.get_absolute_path(path, depth = ndepth)
+        self.mmv_skia_main.context.input_midi = self.get_absolute_path(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
     
     # Output path where we'll be saving the final video
@@ -199,7 +199,7 @@ class MMVSkiaInterface:
 
         # Log action, do action
         logging.info(f"{depth}{debug_prefix} Set output video path: [{path}], getting absolute path..")
-        self.mmv_main.context.output_video = self.utils.get_abspath(path, depth = ndepth)
+        self.mmv_skia_main.context.output_video = self.utils.get_abspath(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
     
     # Offset where we cut the audio for processing, mainly for interpolation latency compensation
@@ -209,7 +209,7 @@ class MMVSkiaInterface:
 
         # Log action, do action
         logging.info(f"{depth}{debug_prefix} Offset audio in N steps: [{steps}]")
-        self.mmv_main.context.offset_audio_before_in_many_steps = steps
+        self.mmv_skia_main.context.offset_audio_before_in_many_steps = steps
         logging.info(STEP_SEPARATOR)
     
     # # [ MMV Objects ] # #
@@ -221,16 +221,16 @@ class MMVSkiaInterface:
 
         # Make layers until this given layer if they don't exist
         logging.info(f"{depth}{debug_prefix} Making animations layer until N = [{layer}]")
-        self.mmv_main.mmv_animation.mklayers_until(layer, depth = ndepth)
+        self.mmv_skia_main.mmv_skia_animation.mklayers_until(layer, depth = ndepth)
 
         # Check the type and add accordingly
         if self.utils.is_matching_type([item], [MMVSkiaImage]):
             logging.info(f"{depth}{debug_prefix} Add MMVSkiaImage object [{item}]")
-            self.mmv_main.mmv_animation.content[layer].append(item)
+            self.mmv_skia_main.mmv_skia_animation.content[layer].append(item)
             
         if self.utils.is_matching_type([item], [MMVSkiaGenerator]):
             logging.info(f"{depth}{debug_prefix} Add MMVSkiaGenerator object [{item}]")
-            self.mmv_main.mmv_animation.generators.append(item)
+            self.mmv_skia_main.mmv_skia_animation.generators.append(item)
 
         logging.info(STEP_SEPARATOR)
 
@@ -243,12 +243,12 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Creating blank MMVSkiaImage object and initializing first animation layer, returning it afterwards")
         
         # Create blank MMVSkiaImage, init the animation layers for the user
-        mmv_image_object = MMVSkiaImage(self.mmv_main, depth = ndepth)
-        mmv_image_object.configure.init_animation_layer(depth = ndepth)
+        mmv_skia_image_object = MMVSkiaImage(self.mmv_skia_main, depth = ndepth)
+        mmv_skia_image_object.configure.init_animation_layer(depth = ndepth)
 
         # Return a pointer to the object
         logging.info(STEP_SEPARATOR)
-        return mmv_image_object
+        return mmv_skia_image_object
 
     # Get a blank MMVSkiaGenerator object
     def generator_object(self, depth = PACKAGE_DEPTH):
@@ -260,7 +260,7 @@ class MMVSkiaInterface:
 
         # Create blank MMVSkiaGenerator, return a pointer to the object
         logging.info(STEP_SEPARATOR)
-        return MMVSkiaGenerator(self.mmv_main, depth = ndepth)
+        return MMVSkiaGenerator(self.mmv_skia_main, depth = ndepth)
 
     # # [ Utilities ] # #
 
@@ -332,7 +332,7 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Generating and returning one PyGradienter object")
 
         logging.info(STEP_SEPARATOR)
-        return PyGradienter(self.mmv_main, depth = ndepth, **kwargs)
+        return PyGradienter(self.mmv_skia_main, depth = ndepth, **kwargs)
     
     # Returns a cmn_midi.py MidiFile class
     def get_midi_class(self):
@@ -347,8 +347,8 @@ class MMVSkiaInterface:
         # Log action
         logging.info(f"{depth}{debug_prefix} Setting AudioProcessing constants to where_decay_less_than_one=[{where_decay_less_than_one}], value_at_zero=[{value_at_zero}]")
 
-        self.mmv_main.audio.where_decay_less_than_one = where_decay_less_than_one
-        self.mmv_main.audio.value_at_zero = value_at_zero
+        self.mmv_skia_main.audio.where_decay_less_than_one = where_decay_less_than_one
+        self.mmv_skia_main.audio.value_at_zero = value_at_zero
 
 
 # Presets on the audio processing, like how and where to apply FFTs, frequencies we want
@@ -360,11 +360,11 @@ class AudioProcessingPresets:
     
     # Custom preset, sends directly those dictionaries
     def preset_custom(self, config: dict) -> None:
-        self.mmv.mmv_main.audio_processing.config = config
+        self.mmv.mmv_skia_main.audio_processing.config = config
 
     def preset_balanced(self) -> None:
         print("[AudioProcessingPresets.preset_balanced]", "Configuring MMV.AudioProcessing to get by matching musical notes frequencies on the FFT, balanced across high frequencies and bass")
-        self.mmv.mmv_main.audio_processing.config = {
+        self.mmv.mmv_skia_main.audio_processing.config = {
             0: {
                 "sample_rate": 1000,
                 "start_freq": 20,
@@ -380,4 +380,4 @@ class AudioProcessingPresets:
     # Do nothing FFT-regarding, useful for speed up on Piano Roll renders
     def preset_dummy(self) -> None:
         print("[AudioProcessingPresets.preset_dummy]", "Configuring MMV.AudioProcessing do nothing, only slice and calculate average value")
-        self.mmv.mmv_main.audio_processing.config = {}
+        self.mmv.mmv_skia_main.audio_processing.config = {}

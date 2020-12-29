@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.piano_rolls.mmv_piano_roll_top_down import MMVSkiaPianoRollTopDown
+from mmv.mmvskia.piano_rolls.mmv_skia_piano_roll_top_down import MMVSkiaPianoRollTopDown
 from mmv.common.cmn_midi import MidiFile
 from mmv.common.cmn_utils import Utils
 

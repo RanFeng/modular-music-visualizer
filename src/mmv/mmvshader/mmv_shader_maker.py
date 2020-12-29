@@ -152,7 +152,7 @@ class MMVShaderMaker:
         debug_prefix = "[MMVShaderMaker._generic_image_shader]"
 
         # Get data on the original shader
-        with open(f"{self.mmvshader_main.DIR}/glsl/mmv_image_shader_template.glsl", "r") as f:
+        with open(f"{self.mmvshader_main.DIR}/glsl/mmv_skia_image_shader_template.glsl", "r") as f:
             shader = f.read()
         
         # # Main routine enabling / configuring stuff

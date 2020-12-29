@@ -26,14 +26,13 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.music_bars.mmv_music_bar_circle import MMVSkiaMusicBarsCircle
+from mmv.mmvskia.music_bars.mmv_skia_music_bar_circle import MMVSkiaMusicBarsCircle
 from mmv.common.cmn_coordinates import PolarCoordinates
 from mmv.common.cmn_interpolation import Interpolation
 from mmv.common.cmn_functions import Functions
+from mmv.mmvskia.mmv_skia_modifiers import *
 from mmv.common.cmn_frame import Frame
 from mmv.common.cmn_utils import Utils
-from mmv.mmvskia.mmv_modifiers import *
-# from resampy import resample
 import numpy as np
 import random
 import math
@@ -57,7 +56,7 @@ class MMVSkiaMusicBarsVectorial:
                 Center point of the radial music bars
                 If set to "center", sets to half the Context.width for center_x and half the Context.height to center_y
             "fft_20hz_multiplier", "fft_20khz_multiplier": float
-                Explained on mmv_music_bar_circle.py
+                Explained on mmv_skia_music_bar_circle.py
             "bar_magnitude_multiplier": float, 1
                 Multiply the default magnitude of bars relative to the FFT by this much
             "bigger_bars_on_magnitude": bool, True

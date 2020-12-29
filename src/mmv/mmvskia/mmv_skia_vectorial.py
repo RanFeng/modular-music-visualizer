@@ -27,9 +27,9 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.mmv_progression_bar import MMVSkiaProgressionBarVectorial
-from mmv.mmvskia.mmv_piano_roll import MMVSkiaPianoRollVectorial
-from mmv.mmvskia.mmv_music_bar import MMVSkiaMusicBarsVectorial
+from mmv.mmvskia.mmv_skia_progression_bar import MMVSkiaProgressionBarVectorial
+from mmv.mmvskia.mmv_skia_piano_roll import MMVSkiaPianoRollVectorial
+from mmv.mmvskia.mmv_skia_music_bar import MMVSkiaMusicBarsVectorial
 
 
 class MMVSkiaVectorial:

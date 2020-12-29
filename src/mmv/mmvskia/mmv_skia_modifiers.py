@@ -27,7 +27,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.mmvskia.mmv_interpolation import MMVSkiaInterpolation
+from mmv.mmvskia.mmv_skia_interpolation import MMVSkiaInterpolation
 from enum import Enum
 import random
 import math

@@ -28,15 +28,15 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
 from mmv.mmvskia.pyskt.pyskt_backend import SkiaNoWindowBackend
+from mmv.mmvskia.mmv_skia_animation import MMVSkiaAnimation
 from mmv.common.cmn_coordinates import PolarCoordinates
 from mmv.common.cmn_interpolation import Interpolation
-from mmv.mmvskia.mmv_animation import MMVSkiaAnimation
+from mmv.mmvskia.mmv_skia_context import MMVContext
+from mmv.mmvskia.mmv_skia_image import MMVSkiaImage
+from mmv.mmvskia.mmv_skia_core import MMVSkiaCore
 from mmv.common.cmn_audio import AudioProcessing
-from mmv.mmvskia.mmv_context import MMVContext
 from mmv.common.cmn_functions import Functions
-from mmv.mmvskia.mmv_image import MMVSkiaImage
 from mmv.common.cmn_video import FFmpegWrapper
-from mmv.mmvskia.mmv_core import MMVSkiaCore
 from mmv.common.cmn_audio import AudioFile
 from mmv.common.cmn_fourier import Fourier
 from mmv.common.cmn_utils import Utils
@@ -63,7 +63,7 @@ class MMVSkiaMain:
         self.utils = Utils()
 
         logging.info(f"{depth}{debug_prefix} Creating MMVContext() class")
-        self.context = MMVContext(mmv_main = self, depth = ndepth)
+        self.context = MMVContext(mmv_skia_main = self, depth = ndepth)
 
         logging.info(f"{depth}{debug_prefix} Creating SkiaNoWindowBackend() class")
         self.skia = SkiaNoWindowBackend()
@@ -93,7 +93,7 @@ class MMVSkiaMain:
         self.audio_processing = AudioProcessing()
 
         logging.info(f"{depth}{debug_prefix} Creating MMVSkiaAnimation() class")
-        self.mmv_animation = MMVSkiaAnimation(mmv_main = self, depth = ndepth)
+        self.mmv_skia_animation = MMVSkiaAnimation(mmv_skia_main = self, depth = ndepth)
     
         logging.info(f"{depth}{debug_prefix} Creating MMVSkiaCore() class")
         self.core = MMVSkiaCore(mmvskia_main = self, depth = ndepth)

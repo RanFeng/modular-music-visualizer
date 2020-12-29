@@ -34,7 +34,7 @@ import skia
 
 
 class MMVSkiaMusicBarsCircle:
-    # Documentation of kwargs of this class on mmv_music_bar.py interface class
+    # Documentation of kwargs of this class on mmv_skia_music_bar.py interface class
     def __init__(self, mmv, MMVSkiaVectorial, **kwargs):
         debug_prefix = "[MMVSkiaMusicBarsCircle.__init__]"
         self.mmv = mmv

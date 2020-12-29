@@ -35,7 +35,7 @@ class SkiaNoWindowBackend:
     kwargs: {
         "width": int
         "height": int
-        "render_backend": str
+        "render_backend": str, ["gpu", "cpu"]
             Use or not a GPU accelerated 
     }
     """
@@ -83,8 +83,10 @@ class SkiaNoWindowBackend:
         rt = glfw.TRUE if self.REALTIME else glfw.FALSE
         glfw.window_hint(glfw.VISIBLE, rt)
         glfw.window_hint(glfw.STENCIL_BITS, 8)
+        # glfw.window_hint(glfw.DOUBLEBUFFER, glfw.FALSE)
         self.window = glfw.create_window(self.width, self.height, str(uuid.uuid4()), None, None)
         glfw.make_context_current(self.window)
+        # glfw.swap_interval(0)
 
     def keep_updating(self):
         while not glfw.window_should_close(self.window):
@@ -101,5 +103,7 @@ class SkiaNoWindowBackend:
         self.canvas.clear(skia.ColorTRANSPARENT)
 
     def canvas_array(self) -> None:
-        return self.surface.toarray()
+        return self.surface.toarray(
+            colorType = skia.kRGBA_8888_ColorType
+        )
 

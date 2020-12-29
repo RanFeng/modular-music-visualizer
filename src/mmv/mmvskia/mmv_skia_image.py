@@ -26,10 +26,10 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
+from mmv.mmvskia.mmv_skia_image_configure import MMVSkiaImageConfigure
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
-from mmv.mmvskia.mmv_image_configure import MMVSkiaImageConfigure
+from mmv.mmvskia.mmv_skia_modifiers import *
 from mmv.common.cmn_frame import Frame
-from mmv.mmvskia.mmv_modifiers import *
 import logging
 import time
 import skia
