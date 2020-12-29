@@ -117,7 +117,6 @@ f"""{depth}{debug_prefix} Show thanks message
 
         logging.info(f"{depth}{debug_prefix} Get and return MMVSkiaInterface, kwargs: {kwargs}")
         
-        # See NOTE below
         return MMVSkiaInterface(top_level_interace = self, depth = ndepth, **kwargs)
     
     # MMVShader works with GLSL shaders through MPV. Currently most
@@ -130,10 +129,17 @@ f"""{depth}{debug_prefix} Show thanks message
 
         logging.info(f"{depth}{debug_prefix} Return MMVShaderInterface")
         
-        # See NOTE below
         return MMVShaderInterface(top_level_interace = self, depth = ndepth)
 
-    # NOTE: 
+    # Return one (usually required) setting up encoder
+    def get_ffmpeg_wrapper(self, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVInterface.get_ffmpeg_wrapper]"
+        ndepth = depth + LOG_NEXT_DEPTH
+        from mmv.common.cmn_video import FFmpegWrapper
+
+        logging.info(f"{depth}{debug_prefix} Return FFmpegWrapper")
+        
+        return FFmpegWrapper()
 
     # Main interface class, mainly sets up root dirs, get config, distributes classes
     def __init__(self, depth = PACKAGE_DEPTH, **kwargs) -> None:
@@ -339,6 +345,18 @@ f"""{depth}{debug_prefix} Show thanks message
             self.externals_dir + f"{sep}mpv",
             self.externals_dir
         ]
+    
+    # Search for something in system's PATH, also searches for the externals folder
+    # Don't append the extra .exe because Linux, macOS doesn't have these
+    def find_binary(self, binary, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVInterface.find_binary]"
+        ndepth = depth + LOG_NEXT_DEPTH
+        logging.info(LOG_SEPARATOR)
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Finding binary in PATH and EXTERNALS directories: [{binary}]")
+
+        return self.utils.get_executable_with_name(binary)
 
     # Make sure we have FFmpeg
     def download_check_ffmpeg(self, making_release = False, depth = PACKAGE_DEPTH):

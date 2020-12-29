@@ -40,3 +40,30 @@ class MMVShaderShady:
         debug_prefix = "[MMVShaderShady.__init__]"
         ndepth = depth + LOG_NEXT_DEPTH
         self.mmv_shader_main = mmv_shader_main
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Initialized MMVShaderShady, starting up empty configuration")
+
+        # Reset to a blank config
+        self.reset(depth = ndepth)
+
+    # Get one Common FFmpegWrapper class, needed!!
+    def get_ffmpeg_wrapper(self, ffmpeg, depth = LOG_NO_DEPTH):
+        debug_prefix = "[MMVShaderShady.reset]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Get FFmpeg wrapper located at [{ffmpeg}]")
+
+        self.ffmpeg = ffmpeg
+
+    # Reset to a blank configuration
+    def reset(self, depth = LOG_NO_DEPTH):
+        debug_prefix = "[MMVShaderShady.reset]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Reset config")
+
+        # Command to execute shady
+        self.__command = [self.mmv_shader_main.utils.get_executable_with_name("shady")]

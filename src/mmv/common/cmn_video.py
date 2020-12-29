@@ -42,11 +42,12 @@ class FFmpegWrapper:
 
     # Create a FFmpeg writable pipe for generating a video
     # For more detailed info see [https://trac.ffmpeg.org/wiki/Encode/H.264]
-    def pipe_images_to_video(self, 
+    def configure_encoding(self, 
         ffmpeg_binary_path: str,  # Path to the ffmpeg binary
         width: int,
         height: int,
-        input_audio_file: str,  # Path
+        input_audio_source: str,  # Path, None for disabling
+        input_video_source: str,  # Path, "pipe" for pipe
         output_video: str, # Path
         pix_fmt: str,  # rgba, rgb24, bgra
         framerate: int,
@@ -55,35 +56,48 @@ class FFmpegWrapper:
         opencl: bool = False,  # Add -x264opts opencl ?
         dumb_player: bool = True,  # Add -vf format=yuv420p for compatibility
         crf: int = 17,  # Constant Rate Factor [0: lossless, 23: default, 51: worst] 
+        tune: str = "film",  # x264 tuning, ["film", "animation"]
         vcodec: str = "libx264",  # Encoder library, libx264 or libx265
         override: bool = True,  # Do override the target output video if it exists?
         depth = LOG_NO_DEPTH,
     ) -> None:
 
-        debug_prefix = "[FFmpegWrapper.pipe_images_to_video]"
+        debug_prefix = "[FFmpegWrapper.configure_pipe_images_to_video]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Generate the command for piping images to
-        ffmpeg_pipe_command = [
+        self.ffmpeg_command = [
             ffmpeg_binary_path
         ]
 
         # Add hwaccel flag if it's set
         if hwaccel is not None:
-            ffmpeg_pipe_command += ["-hwaccel", hwaccel]
+            self.ffmpeg_command += ["-hwaccel", hwaccel]
 
         # Add the rest of the command
-        ffmpeg_pipe_command += [
+        self.ffmpeg_command += [
             "-loglevel", "panic",
             "-nostats",
             "-hide_banner",
-            "-f", "rawvideo",
-            # "-vcodec", "rawvideo",
             "-pix_fmt", pix_fmt,
             "-r", f"{framerate}",
-            "-s", f"{width}x{height}",
-            "-i", "-",
-            "-i", input_audio_file,
+            "-s", f"{width}x{height}"
+        ]
+        
+        # Input video source
+        if input_video_source == "pipe":
+            self.ffmpeg_command += ["-f", "rawvideo", "-i", "-"]
+        else:
+            self.ffmpeg_command += ["-i", input_video_source]
+        
+        # Do input audio or not
+        if input_audio_source:
+            self.ffmpeg_command += ["-i", input_audio_source,]
+        else:
+            self.ffmpeg_command += ["-vn"]
+        
+        # Continue adding commands
+        self.ffmpeg_command += [
             "-c:v", f"{vcodec}",
             "-preset", preset,
             "-r", f"{framerate}",
@@ -93,26 +107,31 @@ class FFmpegWrapper:
 
         # Compatibility mode
         if dumb_player:
-            ffmpeg_pipe_command += ["-vf", "format=yuv420p"]
+            self.ffmpeg_command += ["-vf", "format=yuv420p"]
 
         # Add opencl to x264 flags?
         if opencl:
-            ffmpeg_pipe_command += ["-x264opts", "opencl"]
+            self.ffmpeg_command += ["-x264opts", "opencl"]
    
         # Add output video
-        ffmpeg_pipe_command += [output_video]
+        self.ffmpeg_command += [output_video]
 
         # Do override the target output video
         if override:
-            ffmpeg_pipe_command.append("-y")
+            self.ffmpeg_command.append("-y")
 
         # Log the command for generating final video
-        logging.info(f"{depth}{debug_prefix} FFmpeg command is: {ffmpeg_pipe_command}")
-        logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess..")
+        logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.ffmpeg_command}")
+      
+    def pipe_images_to_video(self, depth = LOG_NO_DEPTH):
+        debug_prefix = "[FFmpegWrapper.pipe_images_to_video]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess with command {self.ffmpeg_command}")
 
         # Create a subprocess in the background
         self.pipe_subprocess = subprocess.Popen(
-            ffmpeg_pipe_command,
+            self.ffmpeg_command,
             stdin  = subprocess.PIPE,
             stdout = subprocess.PIPE,
         )

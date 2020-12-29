@@ -86,55 +86,9 @@ class MMVSkiaCore:
         # Create the pipe write thread
         if not ONLY_PROCESS_AUDIO:
            
-            # Set pixel format according to the OS
-            if self.mmvskia_main.context.ffmpeg_pixel_format == "auto":
-                logging.info(f"{depth}{debug_prefix} Pixel format is [auto], getting right one based on the OS..")
-
-                # Windows
-                if self.mmvskia_main.utils.os == "windows":
-                    logging.info(f"{depth}{debug_prefix} Pixel format set to [bgra] because Windows OS")
-                    pixel_format = "bgra"
-
-                # Linux
-                elif self.mmvskia_main.utils.os == "linux":
-                    logging.info(f"{depth}{debug_prefix} Pixel format set to [rgba] because GNU/Linux OS")
-                    pixel_format = "rgba"
-                
-                # MacOS
-                elif self.mmvskia_main.utils.os == "macos":
-                    logging.info(f"{depth}{debug_prefix} Pixel format set to [rgba] because Darwin / MacOS")
-                    pixel_format = "rgba"
-
-                else: # Not configured, found?
-                    raise RuntimeError(f"Pixel format \"auto\" not found for OS: [{self.mmvskia_main.utils.os}]")
-            else:
-                pixel_format = self.mmvskia_main.context.ffmpeg_pixel_format
-
             # Start video pipe
             logging.info(f"{depth}{debug_prefix} Starting FFmpeg Pipe")
-            self.mmvskia_main.ffmpeg.pipe_images_to_video(
-
-                # Search for a FFmpeg binary
-                ffmpeg_binary_path = self.mmvskia_main.utils.get_executable_with_name(
-                    "ffmpeg",
-                    extra_paths = self.mmvskia_main.mmvskia_interface.top_level_interace.externals_dir,
-                    depth = ndepth    
-                ),
-
-                # Dump MMVContext configuration
-                width = self.mmvskia_main.context.width,
-                height = self.mmvskia_main.context.height,
-                input_audio_file = self.mmvskia_main.context.input_audio_file,
-                output_video = self.mmvskia_main.context.output_video,
-                pix_fmt = pixel_format,
-                framerate = self.mmvskia_main.context.fps,
-                preset = self.mmvskia_main.context.x264_preset,
-                hwaccel = self.mmvskia_main.context.ffmpeg_hwaccel,
-                opencl = self.mmvskia_main.context.x264_use_opencl,
-                dumb_player = self.mmvskia_main.context.ffmpeg_dumb_player,
-                crf = self.mmvskia_main.context.x264_crf,
-                depth = ndepth,
-            )
+            self.mmvskia_main.ffmpeg.pipe_images_to_video()
 
             # Create pipe writer thread
             logging.info(f"{depth}{debug_prefix} Creating pipe writer thread")

@@ -65,10 +65,10 @@ THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 interface = mmv.MMVInterface()
 
 # # Get MMVSkia interface
-processing = interface.get_skia_interface()
+mmv_skia_interface = interface.get_skia_interface()
 
 # Configure stuff
-processing.configure_mmv_skia_main(
+mmv_skia_interface.configure_mmv_skia_main(
 
     # # MMV settings
 
@@ -82,56 +82,8 @@ processing.configure_mmv_skia_main(
     # on the final video render if no flag was passed. Generating images such as
     # particles and backgrounds is done on CPU as no textures are being moved.
     render_backend = args.render,
-
-    # # Video encoding settings
-
-    # AFAIK skia-python on Linux and MacOS uses RGBA and on Windows BGRA pixel format.
-    # "auto" does that, or manually put "rgba" or "bgra". If set wrongly the video
-    # colors RED and BLUE will be swapped.
-    ffmpeg_pixel_format = "auto",
-
-    # Try utilizing hardware acceleration? Set to None for ignoting this
-    ffmpeg_hwaccel = "auto",
-
-    # Quote from FFmpeg H264 encode guide:
-    #   "Encoding for dumb players
-    #  You may need to use -vf format=yuv420p (or the alias -pix_fmt yuv420p) for
-    #  your output to work in QuickTime and most other players. These players only
-    #  support the YUV planar color space with 4:2:0 chroma subsampling for H.264 video.
-    #  Otherwise, depending on your source, ffmpeg may output to a pixel format that may
-    #                                               be incompatible with these players."
-    ffmpeg_dumb_player = True, 
-
-    # If True adds "-x264opts opencl" to the FFmpeg command. Can make FFmpeg have a
-    # startup time of a few seconds, will disable for compatibility since not everyone
-    # have opencl loaders, etc.
-    x264_use_opencl = False,
-
-    # Constant Rate Factor of x264 or x265 encoding, 0 is lossless, 51 is the worst,
-    # 23 the the default. Low values means higher quality and bigger file size
-    x264_crf = 17,
-
-    # Encoder preset, possible values are:
-    #  > ["placebo", "veryslow", "slowest", "slow",
-    #     "medium", "fast", "faster", "veryfast",
-    #     "superfast", "ultrafast"]
-    #
-    # Slower presets yields a higher quality encoding but utilize more CPU,
-    # since MMVSkia is by no means no realtime, a slow preset should be enough since
-    # the FFmpeg process is run in parallel. 
-    x264_preset = "slow",
-
-    # Tune video encoder for:
-    # "film":       Mostly IRL stuff, shouldn't hurt letting this default
-    # "animation":  Animes in general, we use this default as
-    # "grain":      Optimized for old / grainy contents for preserving it
-    # "fastdecode": For low compute power devices to have less trouble with
-    x264_tune = "film",
 )
 
-# Ensure we have FFmpeg on Windows, downloads, extracts etc
-# Does nothing for Linux, make sure you have ffmpeg package installed on your distro
-interface.download_check_ffmpeg()
 
 """
 Set the video quality
@@ -144,21 +96,13 @@ Set the video quality
     fps:
         Frame rate of the video, animations should scale accordingly
 """
-processing.quality(
+mmv_skia_interface.quality(
     
     # # # [ Common resolution values ] # # #
 
     # # ["4k" / 2160p]
     # width = 3840,
     # height = 2160,
-
-    # # [WUHD "4k" / 2160p]
-    # width = 5120,
-    # height = 2160,
-
-    # # [WQHD+ Ultra Wide 1600p]
-    # width = 3840,
-    # height = 1600,
 
     # # [Quad HD 1440p]
     # width = 2560,
@@ -188,6 +132,10 @@ processing.quality(
 
     batch_size = 4096,
 )
+
+# Ensure we have FFmpeg on Windows, downloads, extracts etc
+# Does nothing for Linux, make sure you have ffmpeg package installed on your distro
+interface.download_check_ffmpeg()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -239,21 +187,21 @@ if MODE == "music":
             # Change "if True:" to "if False:" for keeping files, also
             # change the number of generated images to something higher :)
             if True:
-                processing.delete_directory(GENERATED_BACKGROUND_DIRECTORY)
-                processing.make_directory_if_doesnt_exist(GENERATED_BACKGROUND_DIRECTORY)
+                mmv_skia_interface.delete_directory(GENERATED_BACKGROUND_DIRECTORY)
+                mmv_skia_interface.make_directory_if_doesnt_exist(GENERATED_BACKGROUND_DIRECTORY)
 
             # Initialize a canvas we'll generate the backgrounds
             skia = SkiaNoWindowBackend()
             skia.init(
-                width = processing.width,
-                height = processing.height,
+                width = mmv_skia_interface.width,
+                height = mmv_skia_interface.height,
             )
 
             # Get a pygradienter object for generating the images
-            pygradienter = processing.pygradienter(
+            pygradienter = mmv_skia_interface.pygradienter(
                 skia = skia,
-                width = processing.width,
-                height = processing.height,
+                width = mmv_skia_interface.width,
+                height = mmv_skia_interface.height,
                 n_images = 1,
                 output_dir = GENERATED_BACKGROUND_DIRECTORY,
                 mode = "polygons"
@@ -263,7 +211,7 @@ if MODE == "music":
             pygradienter.run()
             skia.terminate_glfw()
             
-            BACKGROUND_IMAGE = processing.random_file_from_dir(GENERATED_BACKGROUND_DIRECTORY)
+            BACKGROUND_IMAGE = mmv_skia_interface.random_file_from_dir(GENERATED_BACKGROUND_DIRECTORY)
 
     # Video background
     elif BACKGROUND_TYPE == "video":
@@ -307,7 +255,7 @@ elif MODE == "piano_roll":
         interface.download_check_musescore()
         
         # Get a MidiFile class and load the Midi
-        midi = processing.get_midi_class()
+        midi = mmv_skia_interface.get_midi_class()
 
         # Save the converted audio on the same directory, change .mid to .mp3
         rendered_midi_to_audio_path = INPUT_MIDI.replace(".mid", ".mp3")
@@ -361,7 +309,7 @@ else:
 
 # By default we store the videos in this RENDER_DIR, create it if it doesn't exist
 RENDER_DIR = THIS_FILE_DIR + "/renders"
-processing.make_directory_if_doesnt_exist(RENDER_DIR)
+mmv_skia_interface.make_directory_if_doesnt_exist(RENDER_DIR)
 
 # Where we'll output the video
 # You can set like OUTPUT_VIDEO = "mmv_output.mkv"
@@ -377,7 +325,7 @@ if OUTPUT_VIDEO == "auto":
         RENDER_DIR + "/"
         f"mmv_{date_and_time}_"
         f"mode-{MODE}_"
-        f"fps-{processing.mmv_skia_main.context.fps}_"
+        f"fps-{mmv_skia_interface.mmv_skia_main.context.fps}_"
         f"{os.path.splitext(os.path.basename(INPUT_AUDIO))[0]}"  # Filename of the audio without extension
         ".mkv"
     )
@@ -392,6 +340,67 @@ PARTICLES_PRESET:
 """
 PARTICLES_PRESET = "middle_out"
 # PARTICLES_PRESET = "bottom_mid_top"
+
+
+# # Video encoding
+
+video_encoder = interface.get_ffmpeg_wrapper()
+video_encoder.configure_encoding(
+    ffmpeg_binary_path = interface.find_binary("ffmpeg"),
+    width = mmv_skia_interface.width,
+    height = mmv_skia_interface.height,
+    input_audio_source = INPUT_AUDIO,
+    input_video_source = "pipe",
+    output_video = OUTPUT_VIDEO,
+    pix_fmt = "rgba",
+    framerate = mmv_skia_interface.fps,
+
+    # Encoder preset, possible values are:
+    #  > ["placebo", "veryslow", "slowest", "slow",
+    #     "medium", "fast", "faster", "veryfast",
+    #     "superfast", "ultrafast"]
+    #
+    # Slower presets yields a higher quality encoding but utilize more CPU,
+    # since MMVSkia is by no means no realtime, a slow preset should be enough since
+    # the FFmpeg process is run in parallel. 
+    preset = "slow",
+
+    # Try utilizing hardware acceleration? Set to None for ignoring this
+    hwaccel = "auto",
+
+    # If True adds "-x264opts opencl" to the FFmpeg command. Can make FFmpeg have a
+    # startup time of a few seconds, will disable for compatibility since not everyone
+    # have opencl loaders, etc.
+    opencl = False,
+
+    # Quote from FFmpeg H264 encode guide:
+    #   "Encoding for dumb players
+    #  You may need to use -vf format=yuv420p (or the alias -pix_fmt yuv420p) for
+    #  your output to work in QuickTime and most other players. These players only
+    #  support the YUV planar color space with 4:2:0 chroma subsampling for H.264 video.
+    #  Otherwise, depending on your source, ffmpeg may output to a pixel format that may
+    #                                               be incompatible with these players."
+    dumb_player = True,
+
+    # Constant Rate Factor of x264 or x265 encoding, 0 is lossless, 51 is the worst,
+    # 23 the the default. Low values means higher quality and bigger file size
+    crf = 17,
+
+    # Tune video encoder for:
+    # "film":       Mostly IRL stuff, shouldn't hurt letting this default
+    # "animation":  Animes in general, we use this default as
+    # "grain":      Optimized for old / grainy contents for preserving it
+    # "fastdecode": For low compute power devices to have less trouble with
+    tune = "film",
+
+    vcodec = "libx264",
+    override = True,
+)
+
+# Set the encoder
+mmv_skia_interface.set_mmv_skia_encoder(
+    ffmpeg = video_encoder    
+)
 
 
 # You can configure the other stuff as follow, better to look at their
@@ -417,7 +426,7 @@ Y increases downwards
 
 # # # # # # Advanced
 
-# processing.advanced_audio_processing_constants(
+# mmv_skia_interface.advanced_audio_mmv_skia_interface_constants(
 #     where_decay_less_than_one = 440,
 #     value_at_zero = 5
 # )
@@ -427,8 +436,8 @@ Y increases downwards
 # Generate random particles
 if PARTICLES:
     PARTICLES_DIRECTORY = THIS_FILE_DIR + "/assets/generated/particles"
-    processing.delete_directory(PARTICLES_DIRECTORY)
-    processing.make_directory_if_doesnt_exist(PARTICLES_DIRECTORY)
+    mmv_skia_interface.delete_directory(PARTICLES_DIRECTORY)
+    mmv_skia_interface.make_directory_if_doesnt_exist(PARTICLES_DIRECTORY)
 
     # Size of the particle image
     particle_width = 200
@@ -440,7 +449,7 @@ if PARTICLES:
     skia.init(width = particle_width, height = particle_height)
 
     # Get a pygradienter object with particle mode
-    pygradienter = processing.pygradienter(
+    pygradienter = mmv_skia_interface.pygradienter(
         skia = skia,
         width = particle_width,
         height = particle_height,
@@ -455,14 +464,14 @@ if PARTICLES:
 
 # The way we process and get the frequencies from the audio, highly
 # influences the frequencies bars on the visualizer itself
-processing.audio_processing.preset_balanced()
+mmv_skia_interface.audio_processing.preset_balanced()
 
 # I/O options, input a audio, output a video
-processing.input_audio(INPUT_AUDIO)
-processing.output_video(OUTPUT_VIDEO)
+mmv_skia_interface.input_audio(INPUT_AUDIO)
+mmv_skia_interface.output_video(OUTPUT_VIDEO)
 
 if (MODE == "piano_roll"):
-    processing.input_midi(INPUT_MIDI)
+    mmv_skia_interface.input_midi(INPUT_MIDI)
 
 # # # Background
 
@@ -470,7 +479,7 @@ if (MODE == "piano_roll"):
 if (MODE == "music") and (BACKGROUND_TYPE == "image"):
 
     # Get an MMV image object
-    background = processing.image_object()
+    background = mmv_skia_interface.image_object()
 
     # We can load an random image from the dir :)
     background.configure.load_image(BACKGROUND_IMAGE)
@@ -510,12 +519,12 @@ if (MODE == "music") and (BACKGROUND_TYPE == "image"):
     # Add the backround object to be generated
     # The layers are a ascending order of blitted items, 0 is first, 1 is after zero
     # So our background is before everything, layer 0
-    processing.add(background, layer=0)
+    mmv_skia_interface.add(background, layer=0)
 
 # Video background
 elif (MODE == "music") and (BACKGROUND_TYPE == "video"):
     # Get an MMV image object
-    background = processing.image_object()
+    background = mmv_skia_interface.image_object()
 
     # On videos they are automatically resized to the output
     # resolution and find this shake value automatically
@@ -524,8 +533,8 @@ elif (MODE == "music") and (BACKGROUND_TYPE == "video"):
     # We can load an video :)
     background.configure.add_module_video(
         path = BACKGROUND_VIDEO,
-        width = processing.width,
-        height = processing.height,
+        width = mmv_skia_interface.width,
+        height = mmv_skia_interface.height,
         over_resize_width = 2*shake,
         over_resize_height = 2*shake,
     )
@@ -555,7 +564,7 @@ elif (MODE == "music") and (BACKGROUND_TYPE == "video"):
     # Add the backround object to be generated
     # The layers are a ascending order of blitted items, 0 is first, 1 is after zero
     # So our background is before everything, layer 0
-    processing.add(background, layer=0)
+    mmv_skia_interface.add(background, layer=0)
 
 elif (MODE == "music"):
     exit("No valid background set for MODE=music")
@@ -563,16 +572,16 @@ elif (MODE == "music"):
 # Piano roll
 
 if (MODE == "piano_roll"):
-    piano_roll = processing.image_object()
+    piano_roll = mmv_skia_interface.image_object()
     piano_roll.configure.add_module_piano_roll(
         seconds_of_midi_content = PIANO_ROLL_SECONDS_OF_MIDI_CONTENT_ON_SCREEN,
         bpm = PIANO_ROLL_MIDI_BPM,
     )
-    processing.add(piano_roll, layer=1)
+    mmv_skia_interface.add(piano_roll, layer=1)
 
 # # # Logo
 
-logo_size = (190/720)*processing.height
+logo_size = (190/720)*mmv_skia_interface.height
 
 # Default MMV Logo
 if ((MODE == "music") and LOGO) and (not TREMX_LOGO):
@@ -580,7 +589,7 @@ if ((MODE == "music") and LOGO) and (not TREMX_LOGO):
     # so I set it to a 200/720 proportion on a HD 720p resolution, but I have to multiply by
     # the new resolution afterwards
 
-    logo = processing.image_object()
+    logo = mmv_skia_interface.image_object()
     logo.configure.load_image(LOGO_IMAGE)
     logo.configure.resize_image_to_resolution(
         width = logo_size,
@@ -592,8 +601,8 @@ if ((MODE == "music") and LOGO) and (not TREMX_LOGO):
     # account the logo size, so the first part gets the center point of the resolution
     # and the second part subtracts half the logo size on each Y and X direction
     logo.configure.add_path_point(
-        x = (processing.width // 2) - (logo_size/2),
-        y = (processing.height // 2) - (logo_size/2),
+        x = (mmv_skia_interface.width // 2) - (logo_size/2),
+        y = (mmv_skia_interface.height // 2) - (logo_size/2),
     )
 
     logo.configure.add_module_resize(
@@ -607,7 +616,7 @@ if ((MODE == "music") and LOGO) and (not TREMX_LOGO):
         smooth = 100,
     )
 
-    processing.add(logo, layer=4)
+    mmv_skia_interface.add(logo, layer=4)
 
 # Tremx logo
 # You can't run this as I don't include the files, it's here more for you to learn and get
@@ -616,7 +625,7 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
 
     # # # Black disk logo
 
-    black_disk_logo = processing.image_object()
+    black_disk_logo = mmv_skia_interface.image_object()
     black_disk_logo.configure.load_image(THIS_FILE_DIR + "/assets/tremx_assets/logo/black-disk.png")
     black_disk_logo.configure.resize_image_to_resolution(
         width = logo_size,
@@ -625,8 +634,8 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
     )
 
     black_disk_logo.configure.add_path_point(
-        x = (processing.width // 2) - (logo_size/2),
-        y = (processing.height // 2) - (logo_size/2),
+        x = (mmv_skia_interface.width // 2) - (logo_size/2),
+        y = (mmv_skia_interface.height // 2) - (logo_size/2),
     )
 
     black_disk_logo.configure.add_module_resize(
@@ -634,11 +643,11 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
         scalar = 2,
     )
 
-    processing.add(black_disk_logo, layer = 4)
+    mmv_skia_interface.add(black_disk_logo, layer = 4)
 
     # # # Sawtooth logo
 
-    sawtooth_logo = processing.image_object()
+    sawtooth_logo = mmv_skia_interface.image_object()
     sawtooth_logo.configure.load_image(THIS_FILE_DIR + "/assets/tremx_assets/logo/sawtooth.png")
     sawtooth_logo.configure.resize_image_to_resolution(
         width = logo_size,
@@ -647,8 +656,8 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
     )
 
     sawtooth_logo.configure.add_path_point(
-        x = (processing.width // 2) - (logo_size/2),
-        y = (processing.height // 2) - (logo_size/2),
+        x = (mmv_skia_interface.width // 2) - (logo_size/2),
+        y = (mmv_skia_interface.height // 2) - (logo_size/2),
     )
 
     sawtooth_logo.configure.add_module_resize(
@@ -662,11 +671,11 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
         smooth = 60,
     )
 
-    processing.add(sawtooth_logo, layer = 5)
+    mmv_skia_interface.add(sawtooth_logo, layer = 5)
 
     # # # Sine Wave logo
 
-    sawtooth_logo = processing.image_object()
+    sawtooth_logo = mmv_skia_interface.image_object()
     sawtooth_logo.configure.load_image(THIS_FILE_DIR + "/assets/tremx_assets/logo/sine.png")
     sawtooth_logo.configure.resize_image_to_resolution(
         width = logo_size,
@@ -675,8 +684,8 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
     )
 
     sawtooth_logo.configure.add_path_point(
-        x = (processing.width // 2) - (logo_size/2),
-        y = (processing.height // 2) - (logo_size/2),
+        x = (mmv_skia_interface.width // 2) - (logo_size/2),
+        y = (mmv_skia_interface.height // 2) - (logo_size/2),
     )
 
     sawtooth_logo.configure.add_module_resize(
@@ -690,13 +699,13 @@ if ((MODE == "music") and LOGO) and (TREMX_LOGO):
         smooth = 140,
     )
 
-    processing.add(sawtooth_logo, layer = 5)
+    mmv_skia_interface.add(sawtooth_logo, layer = 5)
 
 
 # Circle visualizer
 if (MODE == "music") and VISUALIZER:
     # Create a visualizer object, see [TODO] wiki for more information
-    visualizer = processing.image_object()
+    visualizer = mmv_skia_interface.image_object()
     visualizer.configure.add_module_visualizer(
         type = "circle",
         minimum_bar_size = logo_size//2,
@@ -717,14 +726,14 @@ if (MODE == "music") and VISUALIZER:
         scalar = 2.1,
     )
 
-    processing.add(visualizer, layer=3)
+    mmv_skia_interface.add(visualizer, layer=3)
 
 
-# # Post processing / effects
+# # Post mmv_skia_interface / effects
 
 # Particle generator
 if PARTICLES:
-    generator = processing.generator_object()
+    generator = mmv_skia_interface.generator_object()
 
     # See "./mmv/mmv/generators/mmv_skia_particle_generator.py" for configuration, we use the default one here
     generator.particle_generator(
@@ -734,12 +743,12 @@ if PARTICLES:
         particle_maximum_size = 0.085,
     )
 
-    processing.add(generator)
+    mmv_skia_interface.add(generator)
 
 # Bottom progression bar
 if PROGRESSION_BAR:
     # Add basic progression bar
-    prog_bar = processing.image_object()
+    prog_bar = mmv_skia_interface.image_object()
 
     if MODE == "music":
         shake_scalar = 14
@@ -753,15 +762,15 @@ if PROGRESSION_BAR:
         shake_scalar = shake_scalar,
     )
 
-    processing.add(prog_bar, layer=4)
+    mmv_skia_interface.add(prog_bar, layer=4)
 
 
 if VIGNETTING:
-    # Add simple vignetting on default configs on the post processing
+    # Add simple vignetting on default configs on the post mmv_skia_interface
     # Those darken the edges of the screen when the average amplitude of the audio
     # goes up, mostly with the bass. Search for vignetting, you'll see what I mean
-    processing.post_processing.add_module_vignetting(
-        start = processing.width*1.3,
+    mmv_skia_interface.post_mmv_skia_interface.add_module_vignetting(
+        start = mmv_skia_interface.width*1.3,
         minimum = 800,
         scalar = - 1000,
         smooth = 0.1,
@@ -769,4 +778,4 @@ if VIGNETTING:
 
 
 # Run and generate the final video
-processing.run()
+mmv_skia_interface.run()

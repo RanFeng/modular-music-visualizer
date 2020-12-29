@@ -36,7 +36,6 @@ from mmv.mmvskia.mmv_skia_image import MMVSkiaImage
 from mmv.mmvskia.mmv_skia_core import MMVSkiaCore
 from mmv.common.cmn_audio import AudioProcessing
 from mmv.common.cmn_functions import Functions
-from mmv.common.cmn_video import FFmpegWrapper
 from mmv.common.cmn_audio import AudioFile
 from mmv.common.cmn_fourier import Fourier
 from mmv.common.cmn_utils import Utils
@@ -83,8 +82,9 @@ class MMVSkiaMain:
         logging.info(f"{depth}{debug_prefix} Creating Fourier() class")
         self.fourier = Fourier()
 
-        logging.info(f"{depth}{debug_prefix} Creating FFmpegWrapper() class")
-        self.ffmpeg = FFmpegWrapper()
+        # The user must explicitly set and override this, mostly for compatibility
+        # and code cleanup reasons.
+        self.ffmpeg = None
 
         logging.info(f"{depth}{debug_prefix} Creating AudioFile() class")
         self.audio = AudioFile()

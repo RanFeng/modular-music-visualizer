@@ -110,6 +110,7 @@ class MMVSkiaInterface:
         logging.info(LOG_SEPARATOR)
 
         self.configure_mmv_skia_main()
+        self.CONFIGURED_FFMPEG = False
 
         # Quit if code flow says so
         if self.prelude["flow"]["stop_at_interface_init"]:
@@ -122,28 +123,30 @@ class MMVSkiaInterface:
         # Has the user chosen to watch the processing video realtime?
         self.mmv_skia_main.context.audio_amplitude_multiplier = kwargs.get("audio_amplitude_multiplier", 1)
         self.mmv_skia_main.context.skia_render_backend = kwargs.get("render_backend", "gpu")
-
-        # # Encoding options
-
-        # FFmpeg
-        self.mmv_skia_main.context.ffmpeg_pixel_format = kwargs.get("ffmpeg_pixel_format", "auto")
-        self.mmv_skia_main.context.ffmpeg_dumb_player = kwargs.get("ffmpeg_dumb_player", "auto")
-        self.mmv_skia_main.context.ffmpeg_hwaccel = kwargs.get("ffmpeg_hwaccel", "auto")
-
-        # x264 specific
-        self.mmv_skia_main.context.x264_use_opencl = kwargs.get("x264_use_opencl", False)
-        self.mmv_skia_main.context.x264_preset = kwargs.get("x264_preset", "slow")
-        self.mmv_skia_main.context.x264_tune = kwargs.get("x264_tune", "film")
-        self.mmv_skia_main.context.x264_crf = kwargs.get("x264_crf", "17")
-
-        # Pipe writer
         self.mmv_skia_main.context.max_images_on_pipe_buffer = kwargs.get("max_images_on_pipe_buffer", 20)
+
+    def set_mmv_skia_encoder(self, ffmpeg, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVSkiaInterface.set_mmv_skia_encoder]"
+        ndepth = depth + LOG_NEXT_DEPTH
+        logging.info(LOG_SEPARATOR)
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Set FFmpeg wrapper to MMVSkiaMain")
+
+        # Assign
+        self.mmv_skia_main.ffmpeg = ffmpeg
+        self.CONFIGURED_FFMPEG = True
 
     # Execute MMV with the configurations we've done
     def run(self, depth = PACKAGE_DEPTH) -> None:
         debug_prefix = "[MMVSkiaInterface.run]"
         ndepth = depth + LOG_NEXT_DEPTH
         logging.info(LOG_SEPARATOR)
+
+        # Can't continue
+        if not self.CONFIGURED_FFMPEG:
+            logging.critical(f"{depth}{debug_prefix} You have not run the function set_mmv_skia_encoder, please send a configured FFmpegWrapper class to it.")
+            sys.exit(-1)
 
         # Log action
         logging.info(f"{depth}{debug_prefix} Configuration phase done, executing MMVSkiaMain.run()..")
@@ -166,6 +169,7 @@ class MMVSkiaInterface:
         self.width = width
         self.height = height
         self.resolution = [width, height]
+        self.fps = fps
 
         # Create or reset a mmv canvas with that target resolution
         logging.info(f"{depth}{debug_prefix} Creating / resetting canvas with that width and height")
