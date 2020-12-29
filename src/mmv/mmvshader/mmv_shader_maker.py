@@ -36,9 +36,9 @@ import os
 
 
 class MMVShaderMaker:
-    def __init__(self, mmvshader_main):
+    def __init__(self, mmv_shader_main):
         debug_prefix = "[MMVShaderMaker.__init__]"
-        self.mmvshader_main = mmvshader_main
+        self.mmv_shader_main = mmv_shader_main
         
     # # Internal functions
     
@@ -92,7 +92,7 @@ class MMVShaderMaker:
             shader_data = shader.read()
 
         # Get unique ID for saving on the runtime directory
-        unique_id = self.mmvshader_main.utils.get_unique_id(f"Shader at [{input_shader_path}]", depth = ndepth)
+        unique_id = self.mmv_shader_main.utils.get_unique_id(f"Shader at [{input_shader_path}]", depth = ndepth)
 
         # Iterate on the dictionary the user sent us
         for key, value in values.items():
@@ -127,10 +127,10 @@ class MMVShaderMaker:
             shader_data = shader_data.replace(f"<+{key}+>", str(value))
         
         # Get the filename of the original shader
-        original_shader_filename = self.mmvshader_main.utils.get_filename_no_extension(input_shader_path, depth = ndepth)
+        original_shader_filename = self.mmv_shader_main.utils.get_filename_no_extension(input_shader_path, depth = ndepth)
 
         # Where to save this replaced shader
-        runtime_shader_file_path = f"{self.mmvshader_main.context.directories.runtime}{os.path.sep}{original_shader_filename}-[{unique_id}].glsl"
+        runtime_shader_file_path = f"{self.mmv_shader_main.context.directories.runtime}{os.path.sep}{original_shader_filename}-[{unique_id}].glsl"
 
         # Log where it'll be located
         logging.info(f"{depth}{debug_prefix} Saving replaced runtime shader at [{runtime_shader_file_path}]")
@@ -152,7 +152,7 @@ class MMVShaderMaker:
         debug_prefix = "[MMVShaderMaker._generic_image_shader]"
 
         # Get data on the original shader
-        with open(f"{self.mmvshader_main.DIR}/glsl/mmv_skia_image_shader_template.glsl", "r") as f:
+        with open(f"{self.mmv_shader_main.DIR}/glsl/mmv_skia_image_shader_template.glsl", "r") as f:
             shader = f.read()
         
         # # Main routine enabling / configuring stuff
