@@ -67,3 +67,26 @@ class MMVShaderShady:
 
         # Command to execute shady
         self.__command = [self.mmv_shader_main.utils.get_executable_with_name("shady")]
+    
+    """
+    kwargs:
+        shady_binary,
+        width, height, framerate,
+        main_glsl
+    """
+    def base_configuration(self, depth = LOG_NO_DEPTH, **kwargs):
+        debug_prefix = "[MMVShaderShady.reset]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Reset config")
+
+        self.__command += [
+            kwargs.get("shady_binary"),
+            "-i", kwargs.get("main_glsl"),
+            "-ofmt", "rgba32",
+            "-g", str(kwargs.get("width")) + "x" + str(kwargs.get("height")),
+            "-f", str(kwargs.get("framerate"))
+        ]
+
+        logging.info(f"{depth}{debug_prefix} Shady partial run command is: {self.__command}")

@@ -398,7 +398,7 @@ video_encoder.configure_encoding(
 )
 
 # Set the encoder
-mmv_skia_interface.set_mmv_skia_encoder(
+mmv_skia_interface.set_mmv_skia_video_encoder(
     ffmpeg = video_encoder    
 )
 

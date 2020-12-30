@@ -33,13 +33,13 @@ import os
 # Start and get shader interface, assign mpv var to
 # a shorthand for accessing MMVShaderMPV class
 interface = mmv.MMVInterface()
-processing = interface.get_shader_interface()
+mmv_shader_interface = interface.get_shader_interface()
 
 # Aliases for faster accessing functions
-mpv = processing.mmv_shader_main.mpv
-shader_maker = processing.mmv_shader_main.shader_maker
+mpv = mmv_shader_interface.mmv_shader_main.mpv
+shader_maker = mmv_shader_interface.mmv_shader_main.shader_maker
 
-processing.list_shaders()
+mmv_shader_interface.list_mpv_shaders()
 if False: exit()  # Change this to True for listing the shaders and their description then quit
 
 # Ensure we have mpv on Windows, downloads, extracts etc
@@ -89,12 +89,12 @@ if POST_PROCESS_TYPE == "last_render":
         interface.last_session_info_file
     )["audio_amplitudes"]
 
-    # mpv.add_shader(f"{processing.MMV_SHADER_ROOT}/glsl/wip_adaptive-sharpen.glsl")
-    mpv.add_shader(f"{processing.MMV_SHADER_ROOT}/glsl/r1_tsubaup.glsl")
+    # mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/wip_adaptive-sharpen.glsl")
+    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/r1_tsubaup.glsl")
 
     # # Chromatic aberration
     chromatic_aberration_shader = shader_maker.replaced_values_shader(
-        input_shader_path = f"{processing.MMV_SHADER_ROOT}/glsl/fx/r1_chromatic_aberration.glsl",
+        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/fx/r1_chromatic_aberration.glsl",
         changing_amount = activation_values,
         activation = "amount = amount * 3.4",
     )  # This .replaced_values_shader returns the path of the replaced shader
@@ -102,16 +102,16 @@ if POST_PROCESS_TYPE == "last_render":
 
     # # Edge = low saturation
     edge_low_saturation_shader = shader_maker.replaced_values_shader(
-        input_shader_path = f"{processing.MMV_SHADER_ROOT}/glsl/fx/r1_edge_saturation_low.glsl",
+        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/fx/r1_edge_saturation_low.glsl",
         changing_amount = [
             max(2 - (value*5), 0.2) for value in activation_values
         ],
     )  # This .replaced_values_shader returns the path of the replaced shader
     mpv.add_shader(edge_low_saturation_shader)
   
-    mpv.add_shader(f"{processing.MMV_SHADER_ROOT}/glsl/grain.glsl")
+    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/grain.glsl")
 
-# Custom processing, TODO: read the 
+# Custom mmv_shader_interface, TODO: read the 
 elif POST_PROCESS_TYPE == "custom":
     mpv.input_output(
         input_video = f"{THIS_DIR}/shy-piano.mkv",

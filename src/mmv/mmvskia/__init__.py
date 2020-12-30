@@ -125,8 +125,9 @@ class MMVSkiaInterface:
         self.mmv_skia_main.context.skia_render_backend = kwargs.get("render_backend", "gpu")
         self.mmv_skia_main.context.max_images_on_pipe_buffer = kwargs.get("max_images_on_pipe_buffer", 20)
 
-    def set_mmv_skia_encoder(self, ffmpeg, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVSkiaInterface.set_mmv_skia_encoder]"
+    # Set MMVSkiaMain's ffmpeg attribute to the one the user configured
+    def set_mmv_skia_video_encoder(self, ffmpeg, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVSkiaInterface.set_mmv_skia_video_encoder]"
         ndepth = depth + LOG_NEXT_DEPTH
         logging.info(LOG_SEPARATOR)
 
