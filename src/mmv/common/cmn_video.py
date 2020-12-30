@@ -53,12 +53,17 @@ class FFmpegWrapper:
         framerate: int,
         preset: str = "slow",  # libx264 ffmpeg preset
         hwaccel = "auto",  # Try utilizing hardware acceleration? None ignores this flag
+        loglevel: str = "",  # Please set to panic if using pipe, None or "" disables this
+        nostats: bool = False, 
+        hide_banner: bool = True,
         opencl: bool = False,  # Add -x264opts opencl ?
         dumb_player: bool = True,  # Add -vf format=yuv420p for compatibility
         crf: int = 17,  # Constant Rate Factor [0: lossless, 23: default, 51: worst] 
         tune: str = "film",  # x264 tuning, ["film", "animation"]
         vcodec: str = "libx264",  # Encoder library, libx264 or libx265
         override: bool = True,  # Do override the target output video if it exists?
+        t: float = None,  # Stop rendering at some time?
+        vflip: bool = True,  # Apply -vf vflip?
         depth = LOG_NO_DEPTH,
     ) -> None:
 
@@ -74,27 +79,42 @@ class FFmpegWrapper:
         if hwaccel is not None:
             self.ffmpeg_command += ["-hwaccel", hwaccel]
 
+        if loglevel:
+            self.ffmpeg_command += ["-loglevel", loglevel]
+        
+        if nostats:
+            self.ffmpeg_command += ["-nostats"]
+        
+        if hide_banner:
+            self.ffmpeg_command += ["-hide_banner"]
+
         # Add the rest of the command
         self.ffmpeg_command += [
-            "-loglevel", "panic",
-            "-nostats",
-            "-hide_banner",
             "-pix_fmt", pix_fmt,
             "-r", f"{framerate}",
             "-s", f"{width}x{height}"
         ]
+
+        # Stop rendering at some point in time
+        if t:
+            self.ffmpeg_command += ["-t", f"{t}"]
         
         # Input video source
         if input_video_source == "pipe":
             self.ffmpeg_command += ["-f", "rawvideo", "-i", "-"]
+
+            # Danger, we can overflow the buffer this way and get soft locked
+            if not loglevel == "panic":
+                logging.info(f"{depth}{debug_prefix} You are piping a video and loglevel is not set to PANIC")
         else:
             self.ffmpeg_command += ["-i", input_video_source]
         
         # Do input audio or not
         if input_audio_source:
-            self.ffmpeg_command += ["-i", input_audio_source,]
+            self.ffmpeg_command += ["-i", input_audio_source]
         else:
             self.ffmpeg_command += ["-vn"]
+            # pass
         
         # Continue adding commands
         self.ffmpeg_command += [
@@ -112,6 +132,10 @@ class FFmpegWrapper:
         # Add opencl to x264 flags?
         if opencl:
             self.ffmpeg_command += ["-x264opts", "opencl"]
+
+        # Apply vertical flip?
+        if vflip:
+            self.ffmpeg_command += ["-vf", "vflip"]
    
         # Add output video
         self.ffmpeg_command += [output_video]
@@ -123,7 +147,7 @@ class FFmpegWrapper:
         # Log the command for generating final video
         logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.ffmpeg_command}")
       
-    def pipe_images_to_video(self, depth = LOG_NO_DEPTH):
+    def pipe_images_to_video(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
         debug_prefix = "[FFmpegWrapper.pipe_images_to_video]"
         ndepth = depth + LOG_NEXT_DEPTH
 
@@ -132,8 +156,8 @@ class FFmpegWrapper:
         # Create a subprocess in the background
         self.pipe_subprocess = subprocess.Popen(
             self.ffmpeg_command,
-            stdin  = subprocess.PIPE,
-            stdout = subprocess.PIPE,
+            stdin  = stdin,
+            stdout = stdout,
         )
 
         print(debug_prefix, "Open one time pipe")

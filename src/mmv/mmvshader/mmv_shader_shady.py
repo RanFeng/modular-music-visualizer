@@ -46,11 +46,13 @@ class MMVShaderShady:
 
         # Reset to a blank config
         self.reset(depth = ndepth)
+        self.HAVE_FFMPEG_WRAPPER = False
 
     # Get one Common FFmpegWrapper class, needed!!
     def get_ffmpeg_wrapper(self, ffmpeg, depth = LOG_NO_DEPTH):
         debug_prefix = "[MMVShaderShady.reset]"
         ndepth = depth + LOG_NEXT_DEPTH
+        self.HAVE_FFMPEG_WRAPPER = True
 
         # Log action
         logging.info(f"{depth}{debug_prefix} Get FFmpeg wrapper located at [{ffmpeg}]")
@@ -66,7 +68,7 @@ class MMVShaderShady:
         logging.info(f"{depth}{debug_prefix} Reset config")
 
         # Command to execute shady
-        self.__command = [self.mmv_shader_main.utils.get_executable_with_name("shady")]
+        self.__command = []
     
     """
     kwargs:
@@ -90,3 +92,29 @@ class MMVShaderShady:
         ]
 
         logging.info(f"{depth}{debug_prefix} Shady partial run command is: {self.__command}")
+
+    # Execute
+    def render_to_video(self, depth = LOG_NO_DEPTH):
+        debug_prefix = "[MMVShaderShady.render_to_video]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} Rendering to video")
+
+        # If we haven't set up ffmpeg wrapper or input is not accepting from piper, error
+        if (not self.HAVE_FFMPEG_WRAPPER) or (not "-i -" in ' '.join(self.ffmpeg.ffmpeg_command)):
+            logging.critical(f"{depth}{debug_prefix} Please send an FFmpegWrapper on the function get_ffmpeg_wrapper with input_video_source=\"pipe\"")
+            sys.exit(-1)
+
+        # Start FFmpeg pipe
+        self.ffmpeg.pipe_images_to_video()
+
+        # Warn command
+        logging.info(f"{depth}{debug_prefix} Running pipe to video shady command: {self.__command}, redirect stdout to FFmpeg pipe stding")
+
+        # Create the shady subprocess, redirect its output to the FFmpeg's pipe stdin
+        self.shady_subprocess = subprocess.run(
+            self.__command,
+            stdout = self.ffmpeg.pipe_subprocess.stdin,
+            # stdout = subprocess.PIPE,
+        )

@@ -38,12 +38,17 @@ video_encoder.configure_encoding(
     framerate = FRAMERATE,
     preset = "slow",
     hwaccel = "auto",
+    loglevel = "",
+    nostats = False,
+    hide_banner = False,
     opencl = False,
     dumb_player = True,
     crf = 17,
     tune = "film",
     vcodec = "libx264",
     override = True,
+    t = 10,
+    vflip = True
 )
 
 # Set the encoder
@@ -59,3 +64,4 @@ shady.base_configuration(
     main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/st/fractal.glsl"
 )
 
+shady.render_to_video()
