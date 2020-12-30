@@ -368,6 +368,11 @@ video_encoder.configure_encoding(
     # Try utilizing hardware acceleration? Set to None for ignoring this
     hwaccel = "auto",
 
+    # Don't overflow the subprocess buffer
+    loglevel = "panic",
+    nostats = True,
+    hide_banner = True,
+
     # If True adds "-x264opts opencl" to the FFmpeg command. Can make FFmpeg have a
     # startup time of a few seconds, will disable for compatibility since not everyone
     # have opencl loaders, etc.
@@ -769,7 +774,7 @@ if VIGNETTING:
     # Add simple vignetting on default configs on the post mmv_skia_interface
     # Those darken the edges of the screen when the average amplitude of the audio
     # goes up, mostly with the bass. Search for vignetting, you'll see what I mean
-    mmv_skia_interface.post_mmv_skia_interface.add_module_vignetting(
+    mmv_skia_interface.post_processing.add_module_vignetting(
         start = mmv_skia_interface.width*1.3,
         minimum = 800,
         scalar = - 1000,
