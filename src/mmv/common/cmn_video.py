@@ -39,7 +39,6 @@ import cv2
 
 
 class FFmpegWrapper:
-
     # Create a FFmpeg writable pipe for generating a video
     # For more detailed info see [https://trac.ffmpeg.org/wiki/Encode/H.264]
     def configure_encoding(self, 
@@ -63,6 +62,8 @@ class FFmpegWrapper:
         override: bool = True,  # Do override the target output video if it exists?
         t: float = None,  # Stop rendering at some time?
         vflip: bool = True,  # Apply -vf vflip?
+        shortest: bool = True,
+        profile_compat: str = "baseline",  # x264 profile to use, baseline or main, None to disable, sets -vf yuv420
         depth = LOG_NO_DEPTH,
     ) -> None:
 
@@ -120,14 +121,30 @@ class FFmpegWrapper:
             "-crf", f"{crf}",
         ]
 
+        # video filters
+        vf = []
+
         # Add opencl to x264 flags?
         if opencl:
             self.ffmpeg_command += ["-x264opts", "opencl"]
 
         # Apply vertical flip?
         if vflip:
-            self.ffmpeg_command += ["-vf", "vflip"]
-   
+            vf.append("vflip")
+        
+        if shortest:
+            self.ffmpeg_command += ["-shortest"]
+
+        # h264 profiles / compat        
+        if profile_compat is not None:
+            self.ffmpeg_command += ["-profile:v", profile_compat, "-level", "3.0"]
+            vf.append("format=yuv420p")
+        
+        # Add filters
+        filters = ','.join(vf)
+        if filters:
+            self.ffmpeg_command += ["-vf", filters]
+
         # Add output video
         self.ffmpeg_command += [output_video]
 
