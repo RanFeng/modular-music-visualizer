@@ -86,7 +86,6 @@ class MMVShaderShady:
         self.__command += [
             kwargs.get("shady_binary"),
             "-i", kwargs.get("main_glsl"),
-            "-ofmt", "rgba32",
             "-g", str(kwargs.get("width")) + "x" + str(kwargs.get("height")),
             "-f", str(kwargs.get("framerate"))
         ]
@@ -100,6 +99,10 @@ class MMVShaderShady:
 
         # Log action
         logging.info(f"{depth}{debug_prefix} Rendering to video")
+
+        # Add output format to rgba
+        logging.info(f"{depth}{debug_prefix} Add output format RGBA32 to Shady")
+        self.__command += ["-ofmt", "rgba32"]
 
         # If we haven't set up ffmpeg wrapper or input is not accepting from piper, error
         if (not self.HAVE_FFMPEG_WRAPPER) or (not "-i -" in ' '.join(self.ffmpeg.ffmpeg_command)):
@@ -116,5 +119,15 @@ class MMVShaderShady:
         self.shady_subprocess = subprocess.run(
             self.__command,
             stdout = self.ffmpeg.pipe_subprocess.stdin,
-            # stdout = subprocess.PIPE,
         )
+    
+    # View the shader real time
+    def view_realtime(self, depth = LOG_NO_DEPTH):
+        debug_prefix = "[MMVShaderShady.render_to_video]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # Log action
+        logging.info(f"{depth}{debug_prefix} See shader realtime with command: {self.__command}")
+
+        # Create the shady subprocess, redirect its output to the FFmpeg's pipe stdin
+        self.shady_subprocess = subprocess.run(self.__command, stdout = subprocess.PIPE)

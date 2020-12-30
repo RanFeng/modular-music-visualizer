@@ -378,15 +378,6 @@ video_encoder.configure_encoding(
     # have opencl loaders, etc.
     opencl = False,
 
-    # Quote from FFmpeg H264 encode guide:
-    #   "Encoding for dumb players
-    #  You may need to use -vf format=yuv420p (or the alias -pix_fmt yuv420p) for
-    #  your output to work in QuickTime and most other players. These players only
-    #  support the YUV planar color space with 4:2:0 chroma subsampling for H.264 video.
-    #  Otherwise, depending on your source, ffmpeg may output to a pixel format that may
-    #                                               be incompatible with these players."
-    dumb_player = True,
-
     # Constant Rate Factor of x264 or x265 encoding, 0 is lossless, 51 is the worst,
     # 23 the the default. Low values means higher quality and bigger file size
     crf = 17,

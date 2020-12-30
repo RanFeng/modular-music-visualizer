@@ -57,7 +57,6 @@ class FFmpegWrapper:
         nostats: bool = False, 
         hide_banner: bool = True,
         opencl: bool = False,  # Add -x264opts opencl ?
-        dumb_player: bool = True,  # Add -vf format=yuv420p for compatibility
         crf: int = 17,  # Constant Rate Factor [0: lossless, 23: default, 51: worst] 
         tune: str = "film",  # x264 tuning, ["film", "animation"]
         vcodec: str = "libx264",  # Encoder library, libx264 or libx265
@@ -120,10 +119,6 @@ class FFmpegWrapper:
             "-r", f"{framerate}",
             "-crf", f"{crf}",
         ]
-
-        # Compatibility mode
-        if dumb_player:
-            self.ffmpeg_command += ["-vf", "format=yuv420p"]
 
         # Add opencl to x264 flags?
         if opencl:

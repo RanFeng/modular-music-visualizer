@@ -40,9 +40,8 @@ video_encoder.configure_encoding(
     hwaccel = "auto",
     loglevel = "",
     nostats = False,
-    hide_banner = False,
+    hide_banner = True,
     opencl = False,
-    dumb_player = True,
     crf = 17,
     tune = "film",
     vcodec = "libx264",
@@ -64,4 +63,7 @@ shady.base_configuration(
     main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/st/fractal.glsl",
 )
 
-shady.render_to_video()
+if "render" in sys.argv:
+    shady.render_to_video()
+else:
+    shady.view_realtime()
