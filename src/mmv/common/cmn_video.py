@@ -110,11 +110,8 @@ class FFmpegWrapper:
             self.ffmpeg_command += ["-i", input_video_source]
         
         # Do input audio or not
-        if input_audio_source:
-            self.ffmpeg_command += ["-i", input_audio_source]
-        else:
-            self.ffmpeg_command += ["-vn"]
-            # pass
+        if not input_audio_source is None:
+            self.ffmpeg_command += ["-i", input_audio_source, "-c:a", "copy"]
         
         # Continue adding commands
         self.ffmpeg_command += [
@@ -122,7 +119,6 @@ class FFmpegWrapper:
             "-preset", preset,
             "-r", f"{framerate}",
             "-crf", f"{crf}",
-            "-c:a", "copy",
         ]
 
         # Compatibility mode
