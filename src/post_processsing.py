@@ -37,7 +37,7 @@ mmv_shader_interface = interface.get_shader_interface()
 
 # Aliases for faster accessing functions
 mpv = mmv_shader_interface.mmv_shader_main.mpv
-shader_maker = mmv_shader_interface.mmv_shader_main.shader_maker
+mpv_shader_maker = mmv_shader_interface.mmv_shader_main.mpv_shader_maker
 
 mmv_shader_interface.list_mpv_shaders()
 if False: exit()  # Change this to True for listing the shaders and their description then quit
@@ -90,26 +90,26 @@ if POST_PROCESS_TYPE == "last_render":
     )["audio_amplitudes"]
 
     # mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/wip_adaptive-sharpen.glsl")
-    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/r1_tsubaup.glsl")
+    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/mpv/r1_tsubaup.glsl")
 
     # # Chromatic aberration
-    chromatic_aberration_shader = shader_maker.replaced_values_shader(
-        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/fx/r1_chromatic_aberration.glsl",
+    chromatic_aberration_shader = mpv_shader_maker.replaced_values_shader(
+        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/mpv/fx/r1_chromatic_aberration.glsl",
         changing_amount = [round(x, 4) for x in activation_values],
         activation = "amount = amount * 3.4",
     )  # This .replaced_values_shader returns the path of the replaced shader
     mpv.add_shader(chromatic_aberration_shader)
 
     # # Edge = low saturation
-    edge_low_saturation_shader = shader_maker.replaced_values_shader(
-        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/fx/r1_edge_saturation_low.glsl",
+    edge_low_saturation_shader = mpv_shader_maker.replaced_values_shader(
+        input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/mpv/fx/r1_edge_saturation_low.glsl",
         changing_amount = [
             max(2 - (value*5), 0.2) for value in activation_values
         ],
     )  # This .replaced_values_shader returns the path of the replaced shader
     mpv.add_shader(edge_low_saturation_shader)
   
-    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/grain.glsl")
+    mpv.add_shader(f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/mpv/grain.glsl")
 
 # Custom mmv_shader_interface, TODO: read the 
 elif POST_PROCESS_TYPE == "custom":

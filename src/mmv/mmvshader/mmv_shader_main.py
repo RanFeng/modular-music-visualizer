@@ -28,6 +28,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH, STEP_SEPARATOR
+from mmv.mmvshader.mmv_shader_shady_maker import MMVShaderShadyMaker
 from mmv.mmvshader.mmv_shader_mpv_maker import MMVShaderMPVMaker
 from mmv.mmvshader.mmv_shader_context import MMVShaderContext
 from mmv.mmvshader.mmv_shader_shady import MMVShaderShady
@@ -70,5 +71,8 @@ class MMVShaderMain:
 
         logging.info(f"{depth}{debug_prefix} Creating MMVShaderMPVMaker")
         logging.info(STEP_SEPARATOR)
-        self.shader_maker = MMVShaderMPVMaker(self)
+        self.mpv_shader_maker = MMVShaderMPVMaker(self)
 
+        logging.info(f"{depth}{debug_prefix} Creating MMVShaderShadyMaker")
+        logging.info(STEP_SEPARATOR)
+        self.shady_shader_maker = MMVShaderShadyMaker(self)

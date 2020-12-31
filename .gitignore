@@ -42,7 +42,7 @@ src/mmv/mmvshader/runtime
 
 src/mmv/mmvshader/data
 src/mmv/mmvshader/fragment
-src/mmv/mmvshader/glsl/wip*
+src/mmv/mmvshader/glsl/mpv/wip*
 
 # # Tremx logos Yeah this is my identity, you should use yours here :)
 src/mmvskia/assets/tremx_assets

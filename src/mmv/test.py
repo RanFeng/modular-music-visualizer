@@ -20,6 +20,7 @@ interface.download_check_musescore(making_release = True)
 # Shader interface >:)
 mmv_shader_interface = interface.get_shader_interface()
 shady = mmv_shader_interface.mmv_shader_main.shady
+shader_shady_maker = mmv_shader_interface.mmv_shader_main.shady_shader_maker
 
 WIDTH = 1280
 HEIGHT = 720
@@ -55,12 +56,19 @@ shady.get_ffmpeg_wrapper(
     ffmpeg = video_encoder
 )
 
+
+# # Shader
+
+
+
+# #
+
 shady.base_configuration(
     shady_binary = interface.find_binary("shady"),
     width = WIDTH,
     height = HEIGHT,
     framerate = FRAMERATE,
-    main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/st/buffer.glsl",
+    main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/shady/sketch-template.glsl",
 )
 
 if "render" in sys.argv:
