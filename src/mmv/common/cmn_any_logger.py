@@ -47,6 +47,6 @@ if not logger.handlers:
     # Create basic logger
     logging.basicConfig(
         handlers = [logging.StreamHandler(sys.stdout)],
-        level = logging.DEBUG,
+        level = logging.INFO,
         format = "[%(levelname)-7s] %(message)s",
     )

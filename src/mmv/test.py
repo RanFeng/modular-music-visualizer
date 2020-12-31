@@ -21,8 +21,8 @@ interface.download_check_musescore(making_release = True)
 mmv_shader_interface = interface.get_shader_interface()
 shady = mmv_shader_interface.mmv_shader_main.shady
 
-WIDTH = 1920
-HEIGHT = 1080
+WIDTH = 1280
+HEIGHT = 720
 FRAMERATE = 60
 
 # Video encoder
@@ -33,7 +33,7 @@ video_encoder.configure_encoding(
     height = HEIGHT,
     input_audio_source = None,
     input_video_source = "pipe",
-    output_video = f"{THIS_DIR}/../mmvshady.mkv",
+    output_video = f"{THIS_DIR}/../mmvshady.mp4",
     pix_fmt = "rgba",
     framerate = FRAMERATE,
     preset = "slow",
@@ -60,7 +60,7 @@ shady.base_configuration(
     width = WIDTH,
     height = HEIGHT,
     framerate = FRAMERATE,
-    main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/st/fractal.glsl",
+    main_glsl = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/st/buffer.glsl",
 )
 
 if "render" in sys.argv:

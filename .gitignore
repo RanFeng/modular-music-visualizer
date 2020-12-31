@@ -32,6 +32,8 @@ src/mmv/release
 
 # # MMV GLSL Shader
 
+src/mmv/mmvshader/glsl/st
+
 src/mmv/data/last_session_info.toml
 src/mmv/fragment
 src/mmv/mmvshader/pyglslrender.py

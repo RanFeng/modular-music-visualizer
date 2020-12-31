@@ -35,9 +35,9 @@ import sys
 import os
 
 
-class MMVShaderMaker:
+class MMVShaderMPVMaker:
     def __init__(self, mmv_shader_main):
-        debug_prefix = "[MMVShaderMaker.__init__]"
+        debug_prefix = "[MMVShaderMPVMaker.__init__]"
         self.mmv_shader_main = mmv_shader_main
         
     # # Internal functions
@@ -54,7 +54,7 @@ class MMVShaderMaker:
     # Read a template shader from the input path, replaces values in between <++>
     # then saves to runtime dir, returns the path of the new shader
     def replaced_values_shader(self, input_shader_path, depth = LOG_NO_DEPTH, **values) -> str:  # -> Path
-        debug_prefix = "[MMVShaderMaker.replaced_values_shader]"
+        debug_prefix = "[MMVShaderMPVMaker.replaced_values_shader]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
@@ -149,7 +149,7 @@ class MMVShaderMaker:
     }
     """
     def generic_image_shader(self, output_path, **kwargs):
-        debug_prefix = "[MMVShaderMaker._generic_image_shader]"
+        debug_prefix = "[MMVShaderMPVMaker._generic_image_shader]"
 
         # Get data on the original shader
         with open(f"{self.mmv_shader_main.DIR}/glsl/mmv_skia_image_shader_template.glsl", "r") as f:

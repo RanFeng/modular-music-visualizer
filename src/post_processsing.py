@@ -95,7 +95,7 @@ if POST_PROCESS_TYPE == "last_render":
     # # Chromatic aberration
     chromatic_aberration_shader = shader_maker.replaced_values_shader(
         input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/fx/r1_chromatic_aberration.glsl",
-        changing_amount = activation_values,
+        changing_amount = [round(x, 4) for x in activation_values],
         activation = "amount = amount * 3.4",
     )  # This .replaced_values_shader returns the path of the replaced shader
     mpv.add_shader(chromatic_aberration_shader)

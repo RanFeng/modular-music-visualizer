@@ -127,9 +127,10 @@ mmv_skia_interface.quality(
     fps = 60,
     # fps = 30,
     # fps = 24,
+)
 
+mmv_skia_interface.fft(
     # # # [ FFT config ] # # #
-
     batch_size = 4096,
 )
 

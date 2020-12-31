@@ -156,17 +156,16 @@ class MMVSkiaInterface:
         self.mmv_skia_main.run(depth = ndepth)
 
     # Define output video width, height and frames per second, defaults to 720p60
-    def quality(self, width: int = 1280, height: int = 720, fps: int = 60, batch_size = 2048, depth = PACKAGE_DEPTH) -> None:
+    def quality(self, width: int = 1280, height: int = 720, fps: int = 60, depth = PACKAGE_DEPTH) -> None:
         debug_prefix = "[MMVSkiaInterface.quality]"
         ndepth = depth + LOG_NEXT_DEPTH
         
-        logging.info(f"{depth}{debug_prefix} Setting width={width} height={height} fps={fps} batch_size={batch_size}")
+        logging.info(f"{depth}{debug_prefix} Setting width={width} height={height} fps={fps}")
         
         # Assign values
         self.mmv_skia_main.context.width = width
         self.mmv_skia_main.context.height = height
         self.mmv_skia_main.context.fps = fps
-        self.mmv_skia_main.context.batch_size = batch_size
         self.width = width
         self.height = height
         self.resolution = [width, height]
@@ -175,6 +174,16 @@ class MMVSkiaInterface:
         # Create or reset a mmv canvas with that target resolution
         logging.info(f"{depth}{debug_prefix} Creating / resetting canvas with that width and height")
         self.mmv_skia_main.canvas.create_canvas(depth = ndepth)
+        logging.info(STEP_SEPARATOR)
+
+    # Configure the overhaul FFT quality (batch size)
+    def fft(self, batch_size = 2048, depth = PACKAGE_DEPTH) -> None:
+        debug_prefix = "[MMVSkiaInterface.quality]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        logging.info(f"{depth}{debug_prefix} Set FFT batch size to [{batch_size}]")
+
+        self.mmv_skia_main.context.batch_size = batch_size
         logging.info(STEP_SEPARATOR)
 
     # Set the input audio file, raise exception if it does not exist
