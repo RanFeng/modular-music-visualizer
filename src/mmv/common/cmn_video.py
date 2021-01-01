@@ -62,6 +62,7 @@ class FFmpegWrapper:
         override: bool = True,  # Do override the target output video if it exists?
         t: float = None,  # Stop rendering at some time?
         vflip: bool = True,  # Apply -vf vflip?
+        scale: str = None,  # Apply -vf scale=WxH, send like 1280:720 
         shortest: bool = True,
         profile_compat: str = "baseline",  # x264 profile to use, baseline or main, None to disable, sets -vf yuv420
         depth = LOG_NO_DEPTH,
@@ -131,6 +132,9 @@ class FFmpegWrapper:
         # Apply vertical flip?
         if vflip:
             vf.append("vflip")
+        
+        if scale:
+            vf.append(f"scale={scale}")
         
         if shortest:
             self.ffmpeg_command += ["-shortest"]
