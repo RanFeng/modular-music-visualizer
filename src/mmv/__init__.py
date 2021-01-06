@@ -413,6 +413,16 @@ f"""{depth}{debug_prefix} Show thanks message
         # If we do have subdirectories on this platform externals then append to it
         if externals_subdirs:
             self.EXTERNALS_SEARCH_PATH += externals_subdirs
+        
+        # Golang
+        GOPATH = os.environ.get("GOPATH", None)
+
+        if GOPATH is None:
+            logging.warn(f"{depth}{debug_prefix} Couldn't find GOPATH, do you have Golang installed? Required for MMVShaderShady")
+        else:
+            GOPATH = f"{GOPATH}{os.path.sep}bin"
+            logging.info(f"{depth}{debug_prefix} Appending GOPATH bin dir [{GOPATH}]")
+            self.EXTERNALS_SEARCH_PATH.append(GOPATH)
 
     # Search for something in system's PATH, also searches for the externals folder
     # Don't append the extra .exe because Linux, macOS doesn't have these, returns False if no binary was found
@@ -555,7 +565,7 @@ f"""{depth}{debug_prefix} Show thanks message
                     # Where we'll save the compressed zip of FFmpeg
                     mpv_7z = self.downloads_dir + f"{sep}{mpv_7z_version}"
 
-                    # Download FFmpeg build
+                    # Download mpv build
                     self.download.wget(
                         f"https://sourceforge.net/projects/mpv-player-windows/files/64bit/{mpv_7z_version}/download",
                         mpv_7z, f"MPV v=20201220-git-dde0189"
@@ -586,7 +596,7 @@ f"""{depth}{debug_prefix} Show thanks message
 
                     musescore_version = "v3.5.2/MuseScorePortable-3.5.2.311459983-x86.paf.exe"
 
-                    # Download FFmpeg build
+                    # Download musescore
                     self.download.wget(
                         f"https://cdn.jsdelivr.net/musescore/{musescore_version}",
                         f"{self.externals_dir_this_platform}{sep}musescore.exe", f"Musescore Portable v=[{musescore_version}]"
@@ -595,8 +605,88 @@ f"""{depth}{debug_prefix} Show thanks message
                 else:  # Already have the binary
                     logging.info(f"{debug_prefix} Already have [musescore] binary in externals / system path!!")
 
-        # Update the externals search path because we downloaded stuff
-        self.update_externals_search_path()
+            # # Golang
+
+            if external == "golang":
+                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
+
+                # We're on Linux / macOS so checking ffmpeg external dependency on system's path
+                if platform in ["linux", "macos"]:
+                    self.__cant_micro_manage_external_for_you(binary = "go", help_fix = f"Go to [https://golang.org/dl/] and install for your platform, macOS and Linux are highly recommended to install from package manager / distro.")
+                    continue
+                
+                # If we don't have musescore binary on externals dir or system's path
+                if not self.find_binary("go"):
+
+                    golang_installer = "go1.15.6.windows-amd64.msi"
+                    save_golang_installer = f"{self.downloads_dir}{sep}{golang_installer}"
+
+                    # Download Golang installer
+                    self.download.wget(
+                        f"https://golang.org/dl/{golang_installer}",
+                        save_golang_installer, f"Golang installer [{golang_installer}]"
+                    )
+
+                    # Install Golang
+                    install_command = ["msiexec", "/i", save_golang_installer, "/qn"]
+                    logging.info(f"{debug_prefix} Running Golang install command quiet: {install_command}")
+                    subprocess.run(install_command)
+                    
+                else:  # Already have the binary
+                    logging.info(f"{debug_prefix} Already have [go] binary in externals / system path!!")
+
+            # Shady
+
+            if external in ["shady", "upgrade-shady"]:
+                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
+
+                # Ignore we just use to mark we want to go get -u anyways
+                if external == "upgrade-shady":
+                    continue
+
+                # Try finding the shady binary first
+                shady_bin = self.find_binary("shady")
+
+                if shady_bin:
+                    logging.info(f"{debug_prefix} Already have Shady binary, located at [{shady_bin}]")
+                    
+                    # Continue or not? continuing will go get -u, upgrade the shady binary
+                    if not "upgrade-shady" in target_externals:
+                        logging.info(f"{debug_prefix} Already have Shady but not upgrading it, send \"upgrade-shady\" target external to force this")
+                        continue
+                    logging.info(f"{debug_prefix} Continuing Shady reinstalation (will upgrade the binary)")
+
+                # Find the golang binary
+                go_bin = self.find_binary("go")
+
+                # If we don't have musescore binary on externals dir or system's path
+                if not go_bin:
+                    logging.info(f"{debug_prefix} You don't have [go] executable on system's PATH or externals, running check_download_externals(\"go\")?")
+                    self.check_download_externals(target_externals = "go", platform = platform)
+                
+                    # Find the golang binary (again)
+                    go_bin = self.find_binary("go")
+
+                # Log where is the go binary
+                logging.info(f"{debug_prefix} Golang binary is [{go_bin}]")
+
+                # Can we even have "go version" command to run?
+                command = [go_bin, "version"]
+                try:
+                    subprocess.check_output(command)
+                except Exception as e:
+                    logging.error(f"{debug_prefix} For some reason calling {command} failed, {e}")
+                    sys.exit(-1)
+                
+                # The command we'll download, upgrade shady
+                install_shady_command = [go_bin, "get", "-v", "-u", "github.com/polyfloyd/shady/cmd/shady"]
+
+                # Log command, run command
+                logging.info(f"{debug_prefix} Getting and installing polyfloyd's shady (GLSL shader file -> Video), command is {install_shady_command}")
+                subprocess.run(install_shady_command)
+
+            # Update the externals search path because we downloaded stuff
+            self.update_externals_search_path()
 
         logging.info(STEP_SEPARATOR)
 

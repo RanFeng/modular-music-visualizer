@@ -14,7 +14,8 @@ interface = mmv.MMVPackageInterface()
 
 # Testing
 # interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore"], platform = "windows")
-interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore"])
+# interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore", "golang", "shady", "upgrade-shady"])
+interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore", "golang", "shady"])
 exit()
 
 # Shader interface >:)

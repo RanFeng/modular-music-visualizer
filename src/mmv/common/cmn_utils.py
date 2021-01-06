@@ -633,8 +633,8 @@ class Utils:
 
         # Log search paths
         if not silent:
-            logging.warn(f"{depth}{debug_prefix} Extra paths to search: [{extra_paths}]")
-            logging.warn(f"{depth}{debug_prefix} Full search path: [{search_path}]")
+            logging.debug(f"{depth}{debug_prefix} Extra paths to search: [{extra_paths}]")
+            logging.debug(f"{depth}{debug_prefix} Full search path: [{search_path}]")
 
         # Locate it
         locate = shutil.which(binary, path = search_path)
