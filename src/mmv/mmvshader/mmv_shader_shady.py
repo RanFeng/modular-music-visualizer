@@ -49,15 +49,15 @@ class MMVShaderShady:
         self.HAVE_FFMPEG_WRAPPER = False
 
     # Get one Common FFmpegWrapper class, needed!!
-    def get_ffmpeg_wrapper(self, ffmpeg, depth = LOG_NO_DEPTH):
-        debug_prefix = "[MMVShaderShady.reset]"
+    def set_pipe_to(self, pipe_to, depth = LOG_NO_DEPTH):
+        debug_prefix = "[MMVShaderShady.set_pipe_to]"
         ndepth = depth + LOG_NEXT_DEPTH
         self.HAVE_FFMPEG_WRAPPER = True
 
         # Log action
-        logging.info(f"{depth}{debug_prefix} Get FFmpeg wrapper located at [{ffmpeg}]")
+        logging.info(f"{depth}{debug_prefix} Get FFmpeg wrapper located at [{pipe_to}]")
 
-        self.ffmpeg = ffmpeg
+        self.pipe_to = pipe_to
 
     # Reset to a blank configuration
     def reset(self, depth = LOG_NO_DEPTH):
@@ -105,12 +105,12 @@ class MMVShaderShady:
         self.__command += ["-ofmt", "rgba32"]
 
         # If we haven't set up ffmpeg wrapper or input is not accepting from piper, error
-        if (not self.HAVE_FFMPEG_WRAPPER) or (not "-i -" in ' '.join(self.ffmpeg.ffmpeg_command)):
+        if (not self.HAVE_FFMPEG_WRAPPER) or (not "-i -" in ' '.join(self.pipe_to.command)):
             logging.critical(f"{depth}{debug_prefix} Please send an FFmpegWrapper on the function get_ffmpeg_wrapper with input_video_source=\"pipe\"")
             sys.exit(-1)
 
         # Start FFmpeg pipe
-        self.ffmpeg.pipe_images_to_video()
+        self.pipe_to.pipe_images_to_video()
 
         # Warn command
         logging.info(f"{depth}{debug_prefix} Running pipe to video shady command: {self.__command}, redirect stdout to FFmpeg pipe stding")
@@ -118,7 +118,7 @@ class MMVShaderShady:
         # Create the shady subprocess, redirect its output to the FFmpeg's pipe stdin
         self.shady_subprocess = subprocess.run(
             self.__command,
-            stdout = self.ffmpeg.pipe_subprocess.stdin,
+            stdout = self.pipe_to.subprocess.stdin,
         )
     
     # View the shader real time

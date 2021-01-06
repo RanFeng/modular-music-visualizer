@@ -135,11 +135,21 @@ f"""{depth}{debug_prefix} Show thanks message
     def get_ffmpeg_wrapper(self, depth = PACKAGE_DEPTH):
         debug_prefix = "[MMVInterface.get_ffmpeg_wrapper]"
         ndepth = depth + LOG_NEXT_DEPTH
-        from mmv.common.cmn_video import FFmpegWrapper
+        from mmv.common.wrappers.wrap_ffmpeg import FFmpegWrapper
 
         logging.info(f"{depth}{debug_prefix} Return FFmpegWrapper")
         
         return FFmpegWrapper()
+    
+    # Return FFplay wrapper, rarely needed but just in case
+    def get_ffplay_wrapper(self, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVInterface.get_ffplay_wrapper]"
+        ndepth = depth + LOG_NEXT_DEPTH
+        from mmv.common.wrappers.wrap_ffplay import FFplayWrapper
+
+        logging.info(f"{depth}{debug_prefix} Return FFplayWrapper")
+        
+        return FFplayWrapper()
 
     # Main interface class, mainly sets up root dirs, get config, distributes classes
     def __init__(self, depth = PACKAGE_DEPTH, **kwargs) -> None:

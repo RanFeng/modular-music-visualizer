@@ -72,25 +72,25 @@ class FFmpegWrapper:
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Generate the command for piping images to
-        self.ffmpeg_command = [
+        self.command = [
             ffmpeg_binary_path
         ]
 
         # Add hwaccel flag if it's set
         if hwaccel is not None:
-            self.ffmpeg_command += ["-hwaccel", hwaccel]
+            self.command += ["-hwaccel", hwaccel]
 
         if loglevel:
-            self.ffmpeg_command += ["-loglevel", loglevel]
+            self.command += ["-loglevel", loglevel]
         
         if nostats:
-            self.ffmpeg_command += ["-nostats"]
+            self.command += ["-nostats"]
         
         if hide_banner:
-            self.ffmpeg_command += ["-hide_banner"]
+            self.command += ["-hide_banner"]
 
         # Add the rest of the command
-        self.ffmpeg_command += [
+        self.command += [
             "-pix_fmt", pix_fmt,
             "-r", f"{framerate}",
             "-s", f"{width}x{height}"
@@ -98,24 +98,24 @@ class FFmpegWrapper:
 
         # Stop rendering at some point in time
         if t:
-            self.ffmpeg_command += ["-t", f"{t}"]
+            self.command += ["-t", f"{t}"]
         
         # Input video source
         if input_video_source == "pipe":
-            self.ffmpeg_command += ["-f", "rawvideo", "-i", "-"]
+            self.command += ["-f", "rawvideo", "-i", "-"]
 
             # Danger, we can overflow the buffer this way and get soft locked
             if not loglevel == "panic":
                 logging.info(f"{depth}{debug_prefix} You are piping a video and loglevel is not set to PANIC")
         else:
-            self.ffmpeg_command += ["-i", input_video_source]
+            self.command += ["-i", input_video_source]
         
         # Do input audio or not
         if not input_audio_source is None:
-            self.ffmpeg_command += ["-i", input_audio_source, "-c:a", "copy"]
+            self.command += ["-i", input_audio_source, "-c:a", "copy"]
         
         # Continue adding commands
-        self.ffmpeg_command += [
+        self.command += [
             "-c:v", f"{vcodec}",
             "-preset", preset,
             "-r", f"{framerate}",
@@ -127,7 +127,7 @@ class FFmpegWrapper:
 
         # Add opencl to x264 flags?
         if opencl:
-            self.ffmpeg_command += ["-x264opts", "opencl"]
+            self.command += ["-x264opts", "opencl"]
 
         # Apply vertical flip?
         if vflip:
@@ -137,37 +137,37 @@ class FFmpegWrapper:
             vf.append(f"scale={scale}")
         
         if shortest:
-            self.ffmpeg_command += ["-shortest"]
+            self.command += ["-shortest"]
 
         # h264 profiles / compat        
         if profile_compat is not None:
-            self.ffmpeg_command += ["-profile:v", profile_compat, "-level", "3.0"]
+            self.command += ["-profile:v", profile_compat, "-level", "3.0"]
             vf.append("format=yuv420p")
         
         # Add filters
         filters = ','.join(vf)
         if filters:
-            self.ffmpeg_command += ["-vf", filters]
+            self.command += ["-vf", filters]
 
         # Add output video
-        self.ffmpeg_command += [output_video]
+        self.command += [output_video]
 
         # Do override the target output video
         if override:
-            self.ffmpeg_command.append("-y")
+            self.command.append("-y")
 
         # Log the command for generating final video
-        logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.ffmpeg_command}")
+        logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.command}")
       
     def pipe_images_to_video(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
         debug_prefix = "[FFmpegWrapper.pipe_images_to_video]"
         ndepth = depth + LOG_NEXT_DEPTH
 
-        logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess with command {self.ffmpeg_command}")
+        logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess with command {self.command}")
 
         # Create a subprocess in the background
-        self.pipe_subprocess = subprocess.Popen(
-            self.ffmpeg_command,
+        self.subprocess = subprocess.Popen(
+            self.command,
             stdin  = stdin,
             stdout = stdout,
         )
@@ -206,7 +206,7 @@ class FFmpegWrapper:
                 image = self.images_to_pipe.pop(self.count)
 
                 # Pipe the numpy RGB array as image
-                self.pipe_subprocess.stdin.write(image)
+                self.subprocess.stdin.write(image)
 
                 # Finished writing
                 self.lock_writing = False
@@ -238,9 +238,9 @@ class FFmpegWrapper:
             else:
                 time.sleep(0.1)
         
-        self.pipe_subprocess.stdin.close()
+        self.subprocess.stdin.close()
 
-    # Close stdin and stderr of pipe_subprocess and wait for it to finish properly
+    # Close stdin and stderr of subprocess and wait for it to finish properly
     def close_pipe(self):
 
         debug_prefix = "[FFmpegWrapper.close_pipe]"
