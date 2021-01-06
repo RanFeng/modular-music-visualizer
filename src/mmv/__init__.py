@@ -36,6 +36,7 @@ import struct
 import shutil
 import toml
 import math
+import json
 import sys
 import os
 
@@ -45,11 +46,11 @@ import os
 # and mmvshader packages, which this one have the "prelude" attribute
 # which is the dictionary of the file prelude.toml containing
 # general behavior of MMV
-class MMVInterface:
+class MMVPackageInterface:
 
     # Hello world!
     def greeter_message(self, depth = PACKAGE_DEPTH) -> None:
-        debug_prefix = "[MMVInterface.greeter_message]"
+        debug_prefix = "[MMVPackageInterface.greeter_message]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         self.terminal_width = shutil.get_terminal_size()[0]
@@ -71,7 +72,7 @@ f"""{depth}{debug_prefix} Show greeter message\n{"-"*self.terminal_width}
         logging.info(message)
 
     def thanks_message(self, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.thanks_message]"
+        debug_prefix = "[MMVPackageInterface.thanks_message]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # # Print thanks message :)
@@ -111,7 +112,7 @@ f"""{depth}{debug_prefix} Show thanks message
     # through FFmpeg to render a final video. Have Piano Roll options
     # and modules as well!!
     def get_skia_interface(self, depth = PACKAGE_DEPTH, **kwargs):
-        debug_prefix = "[MMVInterface.get_skia_interface]"
+        debug_prefix = "[MMVPackageInterface.get_skia_interface]"
         ndepth = depth + LOG_NEXT_DEPTH
         from mmv.mmvskia import MMVSkiaInterface
 
@@ -123,7 +124,7 @@ f"""{depth}{debug_prefix} Show thanks message
     # applicable concept is post processing which bumps MMV quality
     # by a lot
     def get_shader_interface(self, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.get_shader_interface]"
+        debug_prefix = "[MMVPackageInterface.get_shader_interface]"
         ndepth = depth + LOG_NEXT_DEPTH
         from mmv.mmvshader import MMVShaderInterface
 
@@ -133,7 +134,7 @@ f"""{depth}{debug_prefix} Show thanks message
 
     # Return one (usually required) setting up encoder
     def get_ffmpeg_wrapper(self, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.get_ffmpeg_wrapper]"
+        debug_prefix = "[MMVPackageInterface.get_ffmpeg_wrapper]"
         ndepth = depth + LOG_NEXT_DEPTH
         from mmv.common.wrappers.wrap_ffmpeg import FFmpegWrapper
 
@@ -143,7 +144,7 @@ f"""{depth}{debug_prefix} Show thanks message
     
     # Return FFplay wrapper, rarely needed but just in case
     def get_ffplay_wrapper(self, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.get_ffplay_wrapper]"
+        debug_prefix = "[MMVPackageInterface.get_ffplay_wrapper]"
         ndepth = depth + LOG_NEXT_DEPTH
         from mmv.common.wrappers.wrap_ffplay import FFplayWrapper
 
@@ -152,8 +153,9 @@ f"""{depth}{debug_prefix} Show thanks message
         return FFplayWrapper()
 
     # Main interface class, mainly sets up root dirs, get config, distributes classes
-    def __init__(self, depth = PACKAGE_DEPTH, **kwargs) -> None:
-        debug_prefix = "[MMVInterface.__init__]"
+    # Send platform = "windows", "macos", "linux" for forcing a specific one
+    def __init__(self, platform = None, depth = PACKAGE_DEPTH, **kwargs) -> None:
+        debug_prefix = "[MMVPackageInterface.__init__]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Versioning
@@ -173,23 +175,23 @@ f"""{depth}{debug_prefix} Show thanks message
         sep = os.path.sep
 
         # Where this file is located, please refer using this on the whole package
-        # Refer to it as self.mmv_skia_main.MMV_INTERFACE_ROOT at any depth in the code
+        # Refer to it as self.mmv_skia_main.MMV_PACKAGE_ROOT at any depth in the code
         # This deals with the case we used pyinstaller and it'll get the executable path instead
         if getattr(sys, 'frozen', True):    
-            self.MMV_INTERFACE_ROOT = os.path.dirname(os.path.abspath(__file__))
+            self.MMV_PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
             print(f"{depth}{debug_prefix} Running directly from source code")
-            print(f"{depth}{debug_prefix} Modular Music Visualizer Python package [__init__.py] located at [{self.MMV_INTERFACE_ROOT}]")
+            print(f"{depth}{debug_prefix} Modular Music Visualizer Python package [__init__.py] located at [{self.MMV_PACKAGE_ROOT}]")
         else:
-            self.MMV_INTERFACE_ROOT = os.path.dirname(os.path.abspath(sys.executable))
+            self.MMV_PACKAGE_ROOT = os.path.dirname(os.path.abspath(sys.executable))
             print(f"{depth}{debug_prefix} Running from release (sys.executable..?)")
-            print(f"{depth}{debug_prefix} Modular Music Visualizer executable located at [{self.MMV_INTERFACE_ROOT}]")
+            print(f"{depth}{debug_prefix} Modular Music Visualizer executable located at [{self.MMV_PACKAGE_ROOT}]")
 
         # # Load prelude configuration
 
         print(f"{depth}{debug_prefix} Loading prelude configuration file")
         
         # Build the path the prelude file should be located at
-        prelude_file = f"{self.MMV_INTERFACE_ROOT}{sep}prelude.toml"
+        prelude_file = f"{self.MMV_PACKAGE_ROOT}{sep}prelude.toml"
 
         print(f"{depth}{debug_prefix} Attempting to load prelude file located at [{prelude_file}], we cannot continue if this is wrong..")
 
@@ -229,7 +231,7 @@ f"""{depth}{debug_prefix} Show thanks message
 
             # Hard coded where the log file will be located
             # this is only valid for the last time we run this software
-            self.LOG_FILE = f"{self.MMV_INTERFACE_ROOT}{sep}last_log.log"
+            self.LOG_FILE = f"{self.MMV_PACKAGE_ROOT}{sep}last_log.log"
 
             # Reset the log file
             with open(self.LOG_FILE, "w") as f:
@@ -296,11 +298,15 @@ f"""{depth}{debug_prefix} Show thanks message
         # # The operating system we're on, one of "linux", "windows", "macos"
 
         # Get the desired name from a dict matching against os.name
-        self.os = {
-            "posix": "linux",
-            "nt": "windows",
-            "darwin": "macos"
-        }.get(os.name)
+        if platform is None:
+            self.os = {
+                "posix": "linux",
+                "nt": "windows",
+                "darwin": "macos"
+            }.get(os.name)
+        else:
+            logging.info(f"{depth}{debug_prefix} Overriding platform OS to = [{platform}]")
+            self.os = platform
 
         # Log which OS we're running
         logging.info(f"{depth}{debug_prefix} Running Modular Music Visualizer on Operating System: [{self.os}]")
@@ -317,17 +323,17 @@ f"""{depth}{debug_prefix} Show thanks message
         # # Common directories between packages
 
         # Externals
-        self.externals_dir = f"{self.MMV_INTERFACE_ROOT}{sep}externals"
+        self.externals_dir = f"{self.MMV_PACKAGE_ROOT}{sep}externals"
         logging.info(f"{depth}{debug_prefix} Externals dir is [{self.externals_dir}]")
         self.utils.mkdir_dne(path = self.externals_dir, depth = ndepth)
 
         # Downloads (inside externals)
-        self.downloads_dir = f"{self.MMV_INTERFACE_ROOT}{sep}externals{sep}downloads"
+        self.downloads_dir = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}downloads"
         logging.info(f"{depth}{debug_prefix} Downloads dir is [{self.downloads_dir}]")
         self.utils.mkdir_dne(path = self.downloads_dir, depth = ndepth)
 
         # Data dir
-        self.data_dir = f"{self.MMV_INTERFACE_ROOT}{sep}data"
+        self.data_dir = f"{self.MMV_PACKAGE_ROOT}{sep}data"
         logging.info(f"{depth}{debug_prefix} Data dir is [{self.data_dir}]")
         self.utils.mkdir_dne(path = self.data_dir, depth = ndepth)
 
@@ -348,180 +354,265 @@ f"""{depth}{debug_prefix} Show thanks message
         
         # # External dependencies where to append for PATH
 
-        # When using some function like Utils.get_executable_with_name, it have an
-        # argument called extra_paths, add this for searching for the full externals
-        # directory
-        self.EXTERNALS_SEARCH_PATH = [
-            self.externals_dir + f"{sep}mpv",
-            self.externals_dir
-        ]
+        # Externals directory for Linux
+        self.externals_dir_linux = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}linux"
+        logging.info(f"{debug_prefix} Externals directory for Linux OS is [{self.externals_dir_linux}]")
+        self.utils.mkdir_dne(path = self.externals_dir_linux)
+
+        # Externals directory for Windows
+        self.externals_dir_windows = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}windows"
+        logging.info(f"{debug_prefix} Externals directory for Windows OS is [{self.externals_dir_windows}]")
+        self.utils.mkdir_dne(path = self.externals_dir_windows)
+
+        # Externals directory for macOS
+        self.externals_dir_macos = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}macos"
+        logging.info(f"{debug_prefix} Externals directory for Darwin OS (macOS) is [{self.externals_dir_macos}]")
+        self.utils.mkdir_dne(path = self.externals_dir_macos)
+
+        # # This native platform externals dir
+        self.externals_dir_this_platform = self.__get_platform_external_dir(self.os)
+        logging.info(f"{debug_prefix} This platform externals directory is: [{self.externals_dir_this_platform}]")
+
+        # Update the externals search path (create one in this case)
+        self.update_externals_search_path()
+
+        # Code flow management
+        if self.prelude["flow"]["stop_at_initialization"]:
+            logging.critical(f"{debug_prefix} Exiting as stop_at_initialization key on prelude.toml is True")
+            sys.exit(0)
     
+    # Get the target externals dir for this platform
+    def __get_platform_external_dir(self, platform):
+        debug_prefix = "[MMVPackageInterface.__get_platform_external_dir]"
+
+        # # This platform externals dir
+        externals_dir = {
+            "linux": self.externals_dir_linux,
+            "windows": self.externals_dir_windows,
+            "macos": self.externals_dir_macos,
+        }.get(platform)
+
+        # log action
+        logging.info(f"{debug_prefix} Return external dir for platform [{platform}] -> [{externals_dir}]")
+
+        return externals_dir
+
+    # Update the self.EXTERNALS_SEARCH_PATH to every recursive subdirectory on the platform's externals dir
+    def update_externals_search_path(self, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVPackageInterface.update_externals_search_path]"
+        ndepth = depth + LOG_NEXT_DEPTH
+
+        # The subdirectories on this platform externals folder
+        externals_subdirs = self.utils.get_recursively_all_subdirectories(self.externals_dir_this_platform)
+
+        # When using some function like Utils.get_executable_with_name, it have an argument
+        # called extra_paths, add this for searching for the full externals directory.
+        # Preferably use this interface methods like find_binary instead
+        self.EXTERNALS_SEARCH_PATH = [self.externals_dir_this_platform]
+
+        # If we do have subdirectories on this platform externals then append to it
+        if externals_subdirs:
+            self.EXTERNALS_SEARCH_PATH += externals_subdirs
+
     # Search for something in system's PATH, also searches for the externals folder
-    # Don't append the extra .exe because Linux, macOS doesn't have these
+    # Don't append the extra .exe because Linux, macOS doesn't have these, returns False if no binary was found
     def find_binary(self, binary, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.find_binary]"
+        debug_prefix = "[MMVPackageInterface.find_binary]"
         ndepth = depth + LOG_NEXT_DEPTH
         logging.info(LOG_SEPARATOR)
+
+        # Append .exe for Windows
+        if self.os == "windows":
+            binary += ".exe"
 
         # Log action
         logging.info(f"{depth}{debug_prefix} Finding binary in PATH and EXTERNALS directories: [{binary}]")
 
-        return self.utils.get_executable_with_name(binary)
+        return self.utils.get_executable_with_name(binary, extra_paths = self.EXTERNALS_SEARCH_PATH)
 
-    # Make sure we have FFmpeg
-    def download_check_ffmpeg(self, making_release = False, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.download_check_ffmpeg]"
+    # Make sure we have some target Externals, downloads latest release for them.
+    # For forcing to download the Windows binaries for a release, send platform="windows" for overwriting
+    # otherwise it'll be set to this class's os.
+    #
+    # For FFmpeg, mpv: Linux and macOS people please install from your distro's package manager.
+    #
+    # Possible values for target are: ["ffmpeg", "mpv", "musescore"]
+    #
+    def check_download_externals(self, target_externals = [], platform = None, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVPackageInterface.check_download_externals]"
         ndepth = depth + LOG_NEXT_DEPTH
-        logging.info(LOG_SEPARATOR)
 
-        # Log action
-        logging.info(f"{depth}{debug_prefix} Checking for FFmpeg on Linux or downloading for Windows / if (making release: [{making_release}]")
-
-        if getattr(sys, 'frozen', False):
-            logging.info(f"{depth}{debug_prefix} Not checking ffmpeg.exe because is executable build.. should have ffmpeg.exe bundled?")
-            return
-
-        sep = os.path.sep
-
-        # If the code is being run on a Windows OS
-        if (self.os == "windows") or (making_release):
-
-            # Temporary directory if needed
-            # self.temp_dir = tempfile.gettempdir()
-            # logging.info(f"{depth}{debug_prefix} Temp dir is: [{self.temp_dir}]")
-
-            if making_release:
-                logging.info(f"{depth}{debug_prefix} Getting FFmpeg for Windows because making_release=True")
-
-            # Where we should find the ffmpeg binary
-            FINAL_FFMPEG_FINAL_BINARY = self.externals_dir + f"{sep}ffmpeg.exe"
-
-            # If we don't have FFmpeg binary on externals dir
-            if not os.path.isfile(FINAL_FFMPEG_FINAL_BINARY):
-
-                # Get the latest release number of ffmpeg
-                ffmpeg_release = self.download.get_html_content("https://www.gyan.dev/ffmpeg/builds/release-version")
-                logging.info(f"{depth}{debug_prefix} FFmpeg release number is [{ffmpeg_release}]")
-
-                # Where we'll save the compressed zip of FFmpeg
-                ffmpeg_7z = self.downloads_dir + f"{sep}ffmpeg-{ffmpeg_release}-essentials_build.7z"
-
-                # Download FFmpeg build
-                self.download.wget(
-                    "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.7z",
-                    ffmpeg_7z, f"FFmpeg v={ffmpeg_release}"
-                )
-
-                # Extract the files
-                self.download.extract_file(ffmpeg_7z, self.downloads_dir)
-
-                # Where the FFmpeg binary is located
-                ffmpeg_bin = ffmpeg_7z.replace(".7z", "") + f"{sep}bin{sep}ffmpeg.exe"
-
-                # Move to this directory
-                self.utils.move(ffmpeg_bin, FINAL_FFMPEG_FINAL_BINARY)
-
-            else:
-                logging.info(f"{depth}{debug_prefix} Already have [ffmpeg.exe] downloaded and extracted at [{FINAL_FFMPEG_FINAL_BINARY}]")
+        # Overwrite os if user set to a specific one
+        if platform is None:
+            platform = self.os
         else:
-            # We're on Linux so checking ffmpeg external dependency
-            logging.info(f"{depth}{debug_prefix} You are using Linux, please make sure you have FFmpeg package installed on your distro, we'll just check for it now..")
-            self.utils.has_executable_with_name("ffmpeg", depth = ndepth)
-        logging.info(STEP_SEPARATOR)
+            # Error assertion, only allow linux, macos or windows target os
+            valid = ["linux", "macos", "windows"]
+            if not platform in valid:
+                err = f"Target os [{platform}] not valid: should be one of {valid}"
+                logging.error(f"{debug_prefix} {err}")
+                raise RuntimeError(err)
 
-
-    # Make sure we have MPV
-    def download_check_mpv(self, making_release = False, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.download_check_mpv]"
-        ndepth = depth + LOG_NEXT_DEPTH
-        logging.info(LOG_SEPARATOR)
+        # Force the externals argument to be a list
+        target_externals = self.utils.force_list(target_externals)
 
         # Log action
-        logging.info(f"{depth}{debug_prefix} Checking for MPV on Linux or downloading for Windows / if (making release: [{making_release}]")
+        logging.info(f"{debug_prefix} Checking externals {target_externals} for os = [{platform}]")
 
+        # We're frozen (running from release..)
         if getattr(sys, 'frozen', False):
-            logging.info(f"{depth}{debug_prefix} Not checking mpv.exe because is executable build.. should have ffmpeg.exe bundled?")
+            logging.info(f"{debug_prefix} Not checking for externals because is executable build.. (should have them bundled?)")
             return
 
+        # Short hand
         sep = os.path.sep
+        
+        # The target externals dir for this platform, it must be windows if we're here..
+        target_externals_dir = self.__get_platform_external_dir(platform)
 
-        # If the code is being run on a Windows OS
-        if (self.os == "windows") or (making_release):
+        # For each target external
+        for external in target_externals:
+            debug_prefix = "[MMVPackageInterface.check_download_externals]"
+            logging.info(f"{debug_prefix} Checking / downloading external: [{external}] for platform [{platform}]")
+            
+            # # FFmpeg / FFprobe
 
-            if making_release:
-                logging.info(f"{depth}{debug_prefix} Getting mpv for Windows because making_release=True")
+            if external == "ffmpeg":
+                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
 
-            # Where we should find the ffmpeg binary
-            FINAL_MPV_FINAL_BINARY = self.externals_dir + f"{sep}mpv{sep}mpv.exe"
-
-            # If we don't have FFmpeg binary on externals dir
-            if not os.path.isfile(FINAL_MPV_FINAL_BINARY):
-
-                # Where we'll save the compressed zip of FFmpeg
-                mpv_7z = self.downloads_dir + f"{sep}mpv-x86_64-20201220-git-dde0189.7z"
-
-                # Download FFmpeg build
-                self.download.wget(
-                    "https://sourceforge.net/projects/mpv-player-windows/files/64bit/mpv-x86_64-20201220-git-dde0189.7z/download",
-                    mpv_7z, f"MPV v=20201220-git-dde0189"
-                )
-
-                # Where to extract final mpv
-                mpv_extracted_folder = f"{self.externals_dir}{sep}mpv"
-                self.utils.mkdir_dne(path = mpv_extracted_folder, depth = ndepth)
-
-                # Extract the files
-                self.download.extract_file(mpv_7z, mpv_extracted_folder)
-
-            else:
-                logging.info(f"{depth}{debug_prefix} Already have [mpv.exe] downloaded and extracted at [{FINAL_MPV_FINAL_BINARY}]")
-        else:
-            # We're on Linux so checking ffmpeg external dependency
-            logging.info(f"{depth}{debug_prefix} You are using Linux, please make sure you have MPV package installed on your distro, we'll just check for it now..")
-            self.utils.has_executable_with_name("mpv", depth = ndepth)
-        logging.info(STEP_SEPARATOR)
-
-
-    # Make sure we have musescore
-    def download_check_musescore(self, making_release = False, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVInterface.download_check_mpv]"
-        ndepth = depth + LOG_NEXT_DEPTH
-        logging.info(LOG_SEPARATOR)
-
-        # Log action
-        logging.info(f"{depth}{debug_prefix} Checking for Musescore on Linux or downloading for Windows / if (making release: [{making_release}]")
-
-        if getattr(sys, 'frozen', False):
-            logging.info(f"{depth}{debug_prefix} Not checking musescore.exe because is executable build.. should have ffmpeg.exe bundled?")
-            return
-
-        sep = os.path.sep
-
-        # If the code is being run on a Windows OS
-        if (self.os == "windows") or (making_release):
-
-            if making_release:
-                logging.info(f"{depth}{debug_prefix} Getting mpv for Windows because making_release=True")
-
-            # Where we should find the ffmpeg binary
-            FINAL_MUSESCORE_FINAL_BINARY = self.externals_dir + f"{sep}musescore.exe"
-
-            # If we don't have FFmpeg binary on externals dir
-            if not os.path.isfile(FINAL_MUSESCORE_FINAL_BINARY):
+                # We're on Linux / macOS so checking ffmpeg external dependency on system's path
+                if platform in ["linux", "macos"]:
+                    self.__cant_micro_manage_external_for_you(binary = "ffmpeg")
+                    continue
                 
-                musescore_version = "v3.5.2/MuseScorePortable-3.5.2.311459983-x86.paf.exe"
+                # If we don't have FFmpeg binary on externals dir
+                if not self.find_binary("ffmpeg"):
 
-                # Download FFmpeg build
-                self.download.wget(
-                    f"https://cdn.jsdelivr.net/musescore/{musescore_version}",
-                    FINAL_MUSESCORE_FINAL_BINARY, f"Musescore v=[{musescore_version}]"
-                )
+                    # Get the latest release number of ffmpeg
+                    repo = "https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest"
+                    logging.info(f"{debug_prefix} Getting latest release info on repository: [{repo}]")
+                    ffmpeg_release = json.loads(self.download.get_html_content(repo))
 
-            else:
-                logging.info(f"{depth}{debug_prefix} Already have [musescore.exe] downloaded and extracted at [{FINAL_MUSESCORE_FINAL_BINARY}]")
-        else:
-            # We're on Linux so checking ffmpeg external dependency
-            logging.info(f"{depth}{debug_prefix} You are using Linux, please make sure you have musescore package installed on your distro, we'll just check for it now.. or go to [https://musescore.org/en/download] and install for your platform")
-            if not self.utils.has_executable_with_name("musescore", depth = ndepth):
-                sys.exit(-1)
+                    # The assets (downloadable stuff)
+                    assets = ffmpeg_release["assets"]
+
+                    logging.info(f"{debug_prefix} Available assets to download (checking for non shared, gpl, non vulkan release):")
+
+                    # Parsing the version we target and want
+                    for item in assets:
+
+                        # The name of the 
+                        name = item["name"]
+                        logging.info(f"{debug_prefix} - [{name}]")
+
+                        # Expected stuff
+                        is_lgpl = "lgpl" in name
+                        is_shared = "shared" in name
+                        have_vulkan = "vulkan" in name
+                        from_master = "N" in name
+
+                        # Log what we expect
+                        logging.info(f"{debug_prefix} - :: Is LGPL:                   [{is_lgpl:<1}] (expect: 0)")
+                        logging.info(f"{debug_prefix} - :: Is Shared:                 [{is_shared:<1}] (expect: 0)")
+                        logging.info(f"{debug_prefix} - :: Have Vulkan:               [{have_vulkan:<1}] (expect: 0)")
+                        logging.info(f"{debug_prefix} - :: Master branch (N in name): [{from_master:<1}] (expect: 0)")
+
+                        # We have a match!
+                        if not (is_lgpl + is_shared + have_vulkan + from_master):
+                            logging.info(f"{debug_prefix} - >> :: We have a match!!")
+                            download_url = item["browser_download_url"]
+                            break
+
+                    logging.info(f"{debug_prefix} Download URL: [{download_url}]")
+
+                    # Where we'll save the compressed zip of FFmpeg
+                    ffmpeg_zip = self.downloads_dir + f"{sep}{name}"
+
+                    # Download FFmpeg build
+                    self.download.wget(download_url, ffmpeg_zip, f"FFmpeg v={name}")
+
+                    # Extract the files
+                    self.download.extract_zip(ffmpeg_zip, target_externals_dir)
+
+                else:  # Already have the binary
+                    logging.info(f"{debug_prefix} Already have [ffmpeg] binary in externals / system path!!")
+
+            # # MPV
+
+            if external == "mpv":
+                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
+
+                # We're on Linux / macOS so checking ffmpeg external dependency on system's path
+                if platform in ["linux", "macos"]:
+                    self.__cant_micro_manage_external_for_you(binary = "mpv", help_fix = f"Visit [https://mpv.io/installation/]")
+                    continue
+
+                # If we don't have mpv binary on externals dir or system's path
+                if not self.find_binary("mpv"):
+
+                    mpv_7z_version = "mpv-x86_64-20201220-git-dde0189.7z"
+
+                    # Where we'll save the compressed zip of FFmpeg
+                    mpv_7z = self.downloads_dir + f"{sep}{mpv_7z_version}"
+
+                    # Download FFmpeg build
+                    self.download.wget(
+                        f"https://sourceforge.net/projects/mpv-player-windows/files/64bit/{mpv_7z_version}/download",
+                        mpv_7z, f"MPV v=20201220-git-dde0189"
+                    )
+
+                    # Where to extract final mpv
+                    mpv_extracted_folder = f"{self.externals_dir_this_platform}{sep}" + mpv_7z_version.replace(".7z", "")
+                    self.utils.mkdir_dne(path = mpv_extracted_folder, depth = ndepth)
+
+                    # Extract the files
+                    self.download.extract_file(mpv_7z, mpv_extracted_folder)
+               
+                else:  # Already have the binary
+                    logging.info(f"{debug_prefix} Already have [mpv] binary in externals / system path!!")
+
+            # # MPV
+
+            if external == "musescore":
+                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
+
+                # We're on Linux / macOS so checking ffmpeg external dependency on system's path
+                if platform in ["linux", "macos"]:
+                    self.__cant_micro_manage_external_for_you(binary = "musescore", help_fix = f"Go to [https://musescore.org/en/download] and install for your platform")
+                    continue
+                
+                # If we don't have musescore binary on externals dir or system's path
+                if not self.find_binary("musescore"):
+
+                    musescore_version = "v3.5.2/MuseScorePortable-3.5.2.311459983-x86.paf.exe"
+
+                    # Download FFmpeg build
+                    self.download.wget(
+                        f"https://cdn.jsdelivr.net/musescore/{musescore_version}",
+                        f"{self.externals_dir_this_platform}{sep}musescore.exe", f"Musescore Portable v=[{musescore_version}]"
+                    )
+                    
+                else:  # Already have the binary
+                    logging.info(f"{debug_prefix} Already have [musescore] binary in externals / system path!!")
+
+        # Update the externals search path because we downloaded stuff
+        self.update_externals_search_path()
+
         logging.info(STEP_SEPARATOR)
+
+    # Ensure we have an external dependency we can't micro manage because too much entropy
+    def __cant_micro_manage_external_for_you(self, binary, help_fix = None):
+        debug_prefix = "[MMVPackageInterface.__cant_micro_manage_external_for_you]"
+
+        logging.info(f"{debug_prefix} You are using Linux or macOS, please make sure you have [{binary}] package binary installed on your distro or on homebrew, we'll just check for it nowm, can't continue if you don't have it..")
+        
+        # Can't continue
+        if not self.find_binary(binary):
+            logging.error(f"{debug_prefix} Couldn't find lowercase [{binary}] binary on PATH, install from your Linux distro package manager / macOS homebrew, please install it")
+
+            # Log any extra help we give the user
+            if help_fix is not None:
+                logging.error(f"{debug_prefix} {help_fix}")
+
+            sys.exit(-1)
+    

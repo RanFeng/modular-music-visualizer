@@ -62,7 +62,7 @@ import os
 THIS_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Create the wrapper class
-interface = mmv.MMVInterface()
+interface = mmv.MMVPackageInterface()
 
 # # Get MMVSkia interface
 mmv_skia_interface = interface.get_skia_interface()
@@ -136,7 +136,7 @@ mmv_skia_interface.fft(
 
 # Ensure we have FFmpeg on Windows, downloads, extracts etc
 # Does nothing for Linux, make sure you have ffmpeg package installed on your distro
-interface.download_check_ffmpeg()
+interface.check_download_externals(target_externals = ["ffmpeg"])
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -253,7 +253,7 @@ elif MODE == "piano_roll":
 
         # Check and download musescore (Windows only, Linux homies pls install from package manager)
         # or head to [https://musescore.org/en/download]
-        interface.download_check_musescore()
+        interface.check_download_externals(target_externals = ["musescore"])
         
         # Get a MidiFile class and load the Midi
         midi = mmv_skia_interface.get_midi_class()

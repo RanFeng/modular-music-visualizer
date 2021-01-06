@@ -32,7 +32,7 @@ import os
 
 # Start and get shader interface, assign mpv var to
 # a shorthand for accessing MMVShaderMPV class
-interface = mmv.MMVInterface()
+interface = mmv.MMVPackageInterface()
 mmv_shader_interface = interface.get_shader_interface()
 
 # Aliases for faster accessing functions
@@ -44,7 +44,7 @@ if False: exit()  # Change this to True for listing the shaders and their descri
 
 # Ensure we have mpv on Windows, downloads, extracts etc
 # Does nothing for Linux, make sure you have mpv package installed on your distro
-interface.download_check_mpv()
+interface.check_download_externals(target_externals = ["mpv"])
 
 # Where this insterface is located
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

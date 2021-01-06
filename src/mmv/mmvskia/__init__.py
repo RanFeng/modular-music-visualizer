@@ -213,7 +213,7 @@ class MMVSkiaInterface:
 
         # Log action, do action
         logging.info(f"{depth}{debug_prefix} Set output video path: [{path}], getting absolute path..")
-        self.mmv_skia_main.context.output_video = self.utils.get_abspath(path, depth = ndepth)
+        self.mmv_skia_main.context.output_video = self.utils.get_absolute_realpath(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
     
     # Offset where we cut the audio for processing, mainly for interpolation latency compensation
@@ -286,7 +286,7 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Get absolute path and returning random file from directory: [{path}]")
 
         logging.info(STEP_SEPARATOR)
-        return self.utils.random_file_from_dir(self.utils.get_abspath(path, depth = ndepth), depth = ndepth)
+        return self.utils.random_file_from_dir(self.utils.get_absolute_realpath(path, depth = ndepth), depth = ndepth)
 
     # Make the directory if it doesn't exist
     def make_directory_if_doesnt_exist(self, path: str, depth = PACKAGE_DEPTH, silent = True) -> None:
@@ -297,7 +297,7 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Make directory if doesn't exist [{path}], get absolute realpath and mkdir_dne")
 
         # Get absolute and realpath, make directory if doens't exist (do the action)
-        path = self.utils.get_abspath(path, depth = ndepth, silent = silent)
+        path = self.utils.get_absolute_realpath(path, depth = ndepth, silent = silent)
         self.utils.mkdir_dne(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
     
@@ -310,7 +310,7 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Delete directory [{path}], get absolute realpath and rmdir")
 
         # Get absolute and realpath, delete directory (do the action)
-        path = self.utils.get_abspath(path, depth = ndepth, silent = silent)
+        path = self.utils.get_absolute_realpath(path, depth = ndepth, silent = silent)
         self.utils.rmdir(path, depth = ndepth)
         logging.info(STEP_SEPARATOR)
 
@@ -324,7 +324,7 @@ class MMVSkiaInterface:
         logging.info(f"{depth}{debug_prefix} Getting absolute path of [{path}], also checking its existence")
 
         # Get the absolute path
-        path = self.utils.get_abspath(path, depth = ndepth)
+        path = self.utils.get_absolute_realpath(path, depth = ndepth)
 
         if not os.path.exists(path):
             raise FileNotFoundError(f"Input {message} does not exist {path}")

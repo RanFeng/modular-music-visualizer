@@ -99,7 +99,7 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Make directory if doesn't exist on path: [{path}], getting absolute and realpath first")
 
         # Get the absolute and realpath of it
-        path = self.get_abspath(path = path, depth = ndepth, silent = silent)
+        path = self.get_absolute_realpath(path = path, depth = ndepth, silent = silent)
 
         # Log the absolute and realpath we got
         if not silent:
@@ -142,7 +142,7 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Make empty if doesn't exist on path: [{path}], getting absolute and realpath first")
 
         # Get the absolute and realpath of it
-        path = self.get_abspath(path = path, depth = ndepth, silent = silent)
+        path = self.get_absolute_realpath(path = path, depth = ndepth, silent = silent)
 
         # Log the absolute and realpath we got
         if not silent:
@@ -180,7 +180,7 @@ class Utils:
 
         # Get the absolute and real path of the parent dir
         abspath_realpath_parent_dir = self.get_path_parent_dir(
-                self.get_abspath(
+                self.get_absolute_realpath(
                     path, depth = ndepth + (2*LOG_NEXT_DEPTH), silent = silent
             ), depth = ndepth + LOG_NEXT_DEPTH, silent = silent
         )
@@ -298,9 +298,11 @@ class Utils:
 
         return basename
     
-    # Return an absolute path always, pointing to the 
-    def get_abspath(self, path, depth = LOG_NO_DEPTH, silent = False):
-        debug_prefix = "[Utils.get_abspath]"
+    # Return an absolute and real path always, pointing to the file / directory on the tree
+    # structure where it is truly located (no symlinks) and also relative to the root of the system
+    # that is the absolute path, not relative one, starts with / on Posix and LETTER:\\ on Windows
+    def get_absolute_realpath(self, path, depth = LOG_NO_DEPTH, silent = False):
+        debug_prefix = "[Utils.get_absolute_realpath]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
@@ -364,7 +366,7 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Get filename without extension of path [{path}]")
 
         # Actually get the filename without extension
-        filename_no_ext = os.path.splitext(os.path.basename(self.get_abspath(path)))[0]
+        filename_no_ext = os.path.splitext(os.path.basename(self.get_absolute_realpath(path)))[0]
 
         # Log what we'll return
         if not silent:
@@ -382,13 +384,38 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Get the parent directory of the path [{path}]")
         
         # Get the dirname of the path
-        parent = os.path.dirname(self.get_abspath(path))
+        parent = os.path.dirname(self.get_absolute_realpath(path, silent = True))
 
         # Log action
         if not silent:
             logging.info(f"{depth}{debug_prefix} Parent directory is [{parent}]")
         
         return parent
+    
+    # The name says it all, given a path get all of its subdirectories
+    # Returns empty list "None" --> [] if there is no directory
+    def get_recursively_all_subdirectories(self, path, depth = LOG_NO_DEPTH, silent = False):
+        debug_prefix = "[Utils.get_recursive_subdirectories]"
+
+        # Log action
+        if not silent:
+            logging.info(f"{depth}{debug_prefix} Get recursively all subdirectories of path [{path}]")
+
+        # The subdirectories we find
+        subdirectories = []
+
+        # Walk on the path
+        for root, directories, files in os.walk(path):
+            
+            # Append the root + subdir for every subdir (if there is any)
+            for directory in directories:
+                subdirectories.append(os.path.join(root, directory))
+        
+        # Hard debug
+        if not silent:
+            logging.debug(f"{depth}{debug_prefix} Return subdirectories {subdirectories}")
+
+        return subdirectories
 
     # Get operating system we're running on
     # FIXME: Need testing / get edge cases like:
@@ -418,7 +445,7 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Loading YAML file from path [{path}], getting absolute realpath first")
 
         # Get absolute and realpath
-        path = self.get_abspath(path, depth = ndepth, silent = True)
+        path = self.get_absolute_realpath(path, depth = ndepth, silent = True)
 
         # Error assertion
         self.assert_file(path)
@@ -448,7 +475,7 @@ class Utils:
         self.mkparent_dne(path)
 
         # Get absolute and realpath
-        path = self.get_abspath(path, depth = ndepth, silent = True)
+        path = self.get_absolute_realpath(path, depth = ndepth, silent = True)
 
         with open(path, "w") as f:
             yaml.dump(data, f, default_flow_style = False)
@@ -463,7 +490,7 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Loading TOML file from path [{path}], getting absolute realpath first")
 
         # Get absolute and realpath
-        path = self.get_abspath(path, depth = ndepth, silent = True)
+        path = self.get_absolute_realpath(path, depth = ndepth, silent = True)
 
         # Error assertion
         self.assert_file(path)
@@ -493,7 +520,7 @@ class Utils:
         self.mkparent_dne(path)
 
         # Get absolute and realpath
-        path = self.get_abspath(path, depth = ndepth, silent = True)
+        path = self.get_absolute_realpath(path, depth = ndepth, silent = True)
 
         with open(path, "w") as f:
             f.write(toml.dumps(data))
@@ -522,8 +549,8 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Moving path [{src}] -> [{dst}]")
 
         # Make sure we have the absolute and real path of the targets
-        src = self.get_abspath(src, depth = ndepth, silent = silent)
-        dst = self.get_abspath(dst, depth = ndepth, silent = silent)
+        src = self.get_absolute_realpath(src, depth = ndepth, silent = silent)
+        dst = self.get_absolute_realpath(dst, depth = ndepth, silent = silent)
 
         # Only move if the target directory doesn't exist
         if not os.path.exists(dst):
@@ -543,8 +570,8 @@ class Utils:
             logging.info(f"{depth}{debug_prefix} Copying path [{src}] -> [{dst}]")
 
         # Make sure we have the absolute and real path of the targets
-        src = self.get_abspath(src, depth = ndepth, silent = silent)
-        dst = self.get_abspath(dst, depth = ndepth, silent = silent)
+        src = self.get_absolute_realpath(src, depth = ndepth, silent = silent)
+        dst = self.get_absolute_realpath(dst, depth = ndepth, silent = silent)
 
         # Copy the directories
         # Only move if the target directory doesn't exist

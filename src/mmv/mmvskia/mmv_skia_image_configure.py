@@ -56,7 +56,7 @@ class MMVSkiaImageConfigure:
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Get absolute and real path
-        path = self.mmvskia_main.utils.get_abspath(path, depth = ndepth, silent = not self.preludec["load_image"]["log_get_abspath"])
+        path = self.mmvskia_main.utils.get_absolute_realpath(path, depth = ndepth, silent = not self.preludec["load_image"]["log_get_abspath"])
 
         # Log action
         if self.preludec["load_image"]["log_action"]:

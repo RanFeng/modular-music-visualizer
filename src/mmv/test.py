@@ -10,12 +10,12 @@ sys.path.append(
 
 # Import mmv, get interface
 import mmv
-interface = mmv.MMVInterface()
+interface = mmv.MMVPackageInterface()
 
 # Testing
-interface.download_check_ffmpeg(making_release = True)
-interface.download_check_mpv(making_release = True)
-interface.download_check_musescore(making_release = True)
+# interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore"], platform = "windows")
+interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore"])
+exit()
 
 # Shader interface >:)
 mmv_shader_interface = interface.get_shader_interface()
