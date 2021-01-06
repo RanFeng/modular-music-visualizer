@@ -73,7 +73,7 @@ I also invite you to read about the [Free Software Definition / Philosophy](http
    * [Goals, what is being developed](#goals-what-is-being-developed)
    * [Contributing](#contributing)
    * [User Generated Content, legal](#user-generated-content-copyrighted-material-legal)
-   * [Thank you!](#thank-you)
+   * [Acknowledgements | Thanks to](#acknowledgements-|-thanks-to)
 
 <hr>
 
@@ -147,23 +147,107 @@ Any information, images, file names you configure manually is considered (by me)
 
 I give you a few "free assets" files, those, apart from the MMV logo I created myself on Inkscape, were generated with Python with some old code written by me, you can use them freely. Some are generated on the go if configured (they are on by default) on the running script of MMV.
 
-<hr>
+# Acknowledgements | Thanks to
 
-# Thank You
+I want to show my grattitude to these projects, no joke, MMV wouldn't be possible if these projects didn't exist.
 
-Don't abuse from your freedom the power to ascend with this software with much hard work put on it.
+Those are not in order of importance at all, they are always used together.
 
-Pay back your fees with a simple **"Thank you"** at least.
-
-It doesn't seem much but pursuing something others also keep an expectancy or genuinely changed their lives for good is a hell of a great motivation: **being acknowledged not for feeling superior or meaningless better, but for being helpful, making a difference, gratitude.**
-
-*Don't take this as an obligation, you're free, this software is free.*
-
-The Modular Music Visualizer project definitely changed my life, I grew up so much as a programmer, my problem solving skills accuracy and speed improved a lot, not to mention general organization of stuff.. I'm already victorious on the existence and execution of such code.
-
-Can't forget to **thank a lot all the people behind all the dependencies I used in this project**. We don't need to come up with pythagoras theorem from scratch anymore as someone did that for us in the past. Just like I don't need to make an complex video encoder, there's the FFmpeg team already. Old generations making a better world and time for future ones.
+I'll mainly list the main name and where to find more info, it's just impossible to list every contributor and person that took place into those.
 
 <hr>
 
-My sincere Thank You if you read the README all the way until here, hopefully you learned something new and that this project helped you!!
+### Main ones
+
+<hr>
+
+- Python language (https://www.python.org), where development speed is also a feature.
+
+<hr>
+
+- [MPV](https://mpv.io), the best video player of all, `mpv --list-options | wc -l -> 1097`, near 1100 command line flags and options.
+  
+  - Used for applying specific post processing on videos and encoding them.
+
+<hr>
+
+- [Skia-Python wrapper](https://github.com/kyamagu/skia-python), for a stable Python interface with the [Skia Graphics Library](https://skia.org).
+  
+  - Generates the base videos and piano roll mode graphics.
+
+<hr>
+
+- [FFmpeg, FFplay](https://ffmpeg.org), _"A complete, cross-platform solution to record, convert and stream audio and video."_ - and they are not lying!!
+
+  - "The Only One". Transforms images into videos, adds sound, filters.
+
+<hr>
+
+- The [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) language, OpenGL, Vulkan (on mpv flag), the [Khronos group](https://www.khronos.org) on its entirety, seriously, you guys are awesome!!
+
+  - Also the [Python wrapper](https://pypi.org/project/glfw/) for the [GLFW](https://www.glfw.org/) library for setting up an GL canvas so Skia can draw on.
+
+<hr>
+
+- The [Shady](https://github.com/polyfloyd/shady) project by [polyfloyd](https://github.com/polyfloyd/), for rendering or displaying Shadertoy-like syntax GLSL scripts.
+  
+  - Currently used experimentally for generating video out of shaders (stupidly bigger potential given enough knowledge on shaders for the MMV project) 
+  
+  - I'd assume [Golang](https://golang.org/) as well for making Shady possible.
+
+<hr>
+
+### Python packages and others involved
+
+- [SciPy](https://www.scipy.org/) and [NumPy](https://numpy.org/), the two must have packages on Python, very fast and flexible for scientific computing, lots of QOL functions.
+  
+  - Mainly used for calculating the FFTs and getting their frequencies domain representation.
+  
+<hr>
+
+- [audio2numpy](https://pypi.org/project/audio2numpy), [audioread](https://pypi.org/project/audioread), [soundfile](https://pypi.org/project/SoundFile) for reading an WAV, MP3, OGG and giving me the raw audio data.
+
+<hr>
+
+- [mido](https://pypi.org/project/mido/) for reading MIDI files, transforming ticks to seconds and other utilities for the piano roll visualization.
+
+<hr>
+
+- [OpenCV](https://opencv.org/) and [opencv-python](https://pypi.org/project/opencv-python/), for reading images of a video file without having to extract all of them in the start.
+
+<hr>
+
+- [pip-chill](https://pypi.org/project/pip-chill/) for simplifying the `requirements.txt`.
+
+<hr>
+
+- _Tom's Obvious, Minimal Language._: [Python interface](https://pypi.org/project/toml/), [main project](https://github.com/toml-lang/toml); _YAML Ain't Markup Language_: [Python interface](https://pypi.org/project/PyYAML/), [main project](https://yaml.org/): Both for reading / saving configuration files.
+  
+  - I dislike a bit JSON due to its kinda steep UX at first on fixing the syntax the end user itself, those two helps a lot on the overhaul UX on project I believe.
+
+<hr>
+
+- The [Python Image Library](https://pypi.org/project/Pillow/) Pillow, was extensively used in the past as a render backend but now it is used only for rotating images then sending to Skia.
+
+<hr>
+
+- Python package [samplerate](https://pypi.org/project/samplerate/) for a binding to libsamplerate, used for downsampling audio before calculating the FFT so we get more information on the lower frequencies.
+
+<hr>
+
+- [requests](https://pypi.org/project/requests/). [tqdm](https://pypi.org/project/tqdm), [wget](https://pypi.org/project/wget), [pyunpack](https://pypi.org/project/pyunpack/), [patool](https://pypi.org/project/patool/) for fetching, downloading, showing progress bars and extracting External dependencies automatically for the users.
+
+<hr>
+
+_(There are missing Python dependencies here, mostly others that these packages depends on, but micro managing would be very hard)_
+
+<hr>
+
+### Extras
+
+The [Linux Foundation](https://linuxfoundation.org), contributors with code or money, every distribution I / you used, their package managers, developers, etc; For this amazing platform to develop on.
+
+The platforms MMV code is hosted on.
+
+The Open Source community.
 
