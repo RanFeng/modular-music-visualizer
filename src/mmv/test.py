@@ -24,7 +24,7 @@ shady = mmv_shader_interface.mmv_shader_main.shady
 WIDTH = 1280
 HEIGHT = 720
 FRAMERATE = 60
-supersampling = 2
+supersampling = 1
 
 sep = os.path.sep
 
@@ -47,14 +47,22 @@ shift = f"vec2(sin(iTime*1.2353)/{shift_decrease}, sin(iTime*1.53489)/{shift_dec
 scale = "1.5 + sin(iTime)/40 + cos(iTime*1.13515)/50"
 repeat = "true"
 
+layer2.add_function(
+f"""\
+vec4 draw_image(in vec4 canvas, in vec2 uv) {{
+    return mmv_blit_image(canvas, {target}, {target}Size, uv, {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
+}}
+""")
+
 # Chromatic aberration on top of image
 layer2.add_contents(
 f"""\
 //float amount = 0.003;
 float amount = 0.003 + (iTime/10000);
-vec4 col_r = mmv_blit_image(col, {target}, {target}Size, uv + (vec2(sin(iTime*2.31245), cos(iTime/2.123) + sin(iTime*3.12415)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
-vec4 col_g = mmv_blit_image(col, {target}, {target}Size, uv + 3*(vec2(cos(iTime/2), cos(iTime/4.1234)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
-vec4 col_b = mmv_blit_image(col, {target}, {target}Size, uv + 4*(vec2(cos(iTime/1.35135), sin(iTime*1.23)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
+
+vec4 col_r = draw_image(col, uv + (vec2(sin(iTime*2.31245), cos(iTime/2.123) + sin(iTime*3.12415)) * amount));
+vec4 col_g = draw_image(col, uv + 3*(vec2(cos(iTime/2), cos(iTime/4.1234)) * amount));
+vec4 col_b = draw_image(col, uv + 4*(vec2(cos(iTime/1.35135), sin(iTime*1.23)) * amount));
 
 col.r = col_r.r;
 col.g = col_g.g;
