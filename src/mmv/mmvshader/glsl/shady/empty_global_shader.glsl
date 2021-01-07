@@ -29,6 +29,17 @@
 
 ////ADD_FUNCTIONS
 
+vec4 alpha_composite_layers(in vec2 uv) {
+    // The vectors we keep iterating to alpha composite each layer on top of the previous one
+    vec4 col = vec4(0.0);
+    vec4 next_layer = vec4(0.0);
+
+    // Alpha composite, get layers
+    ////ALPHA_COMPOSITE
+
+    return col;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     // Screen coordinate stretching dealing
@@ -41,15 +52,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // by just doing uv *= constant;
     ////CAMERA_TRANSFORMATION
 
-    // The vectors we keep iterating to alpha composite each layer on top of the previous one
-    vec4 col = vec4(0.0);
-    vec4 next_layer = vec4(0.0);
-
-    // Alpha composite, get layers
-    ////ALPHA_COMPOSITE
-
     ////ADD_CONTENTS
 
     // Return the color
+    vec4 col = alpha_composite_layers(uv);
     fragColor = col;
 }

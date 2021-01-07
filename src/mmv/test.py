@@ -24,7 +24,7 @@ shady = mmv_shader_interface.mmv_shader_main.shady
 WIDTH = 1280
 HEIGHT = 720
 FRAMERATE = 60
-supersampling = 1
+supersampling = 2
 
 sep = os.path.sep
 
@@ -44,12 +44,30 @@ target = "image"
 angle = "sin(iTime/2.2385)/50.0 + cos(iTime/3.49234)/60"
 shift_decrease = 80.0
 shift = f"vec2(sin(iTime*1.2353)/{shift_decrease}, sin(iTime*1.53489)/{shift_decrease} )"
-scale = "1.0 + sin(iTime)/40 + cos(iTime*1.13515)/50"
+scale = "1.5 + sin(iTime)/40 + cos(iTime*1.13515)/50"
 repeat = "true"
 
+# Chromatic aberration on top of image
 layer2.add_contents(
-    f"col = mmv_blit_image(col, {target}, {target}Size, uv, {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});"
+f"""\
+//float amount = 0.003;
+float amount = 0.003 + (iTime/10000);
+vec4 col_r = mmv_blit_image(col, {target}, {target}Size, uv + (vec2(sin(iTime*2.31245), cos(iTime/2.123) + sin(iTime*3.12415)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
+vec4 col_g = mmv_blit_image(col, {target}, {target}Size, uv + 3*(vec2(cos(iTime/2), cos(iTime/4.1234)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
+vec4 col_b = mmv_blit_image(col, {target}, {target}Size, uv + 4*(vec2(cos(iTime/1.35135), sin(iTime*1.23)) * amount), {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});
+
+col.r = col_r.r;
+col.g = col_g.g;
+col.b = col_b.b;
+"""
 )
+
+# # Simple image drawing
+# layer2.add_contents(
+#     f"col = mmv_blit_image(col, {target}, {target}Size, uv, {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});"
+# )
+
+# Zoom in effect on background
 layer2.camera_transformation("uv = uv * atan(iTime);")
 layer2.save()
 
@@ -97,7 +115,7 @@ if "render" in sys.argv:
         tune = "film",
         vcodec = "libx264",
         override = True,
-        t = 30,
+        t = 50,
         vflip = True,
         scale = f"{WIDTH}x{HEIGHT}"
     )

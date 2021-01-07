@@ -49,7 +49,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     uv.x *= screen_ratio_x;
 
     // The color we output in the end
-    vec4 col = vec4(0.0);
+    vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
 
     ////ADD_CONTENTS
 
