@@ -155,39 +155,25 @@ Those are not in order of importance at all, they are always used together.
 
 I'll mainly list the main name and where to find more info, it's just impossible to list every contributor and person that took place into those.
 
-<hr>
-
 ### Main ones
 
-<hr>
-
 - Python language (https://www.python.org), where development speed is also a feature.
-
-<hr>
 
 - [MPV](https://mpv.io), the best video player of all, `mpv --list-options | wc -l -> 1097`, near 1100 command line flags and options.
   
   - Used for applying specific post processing on videos and encoding them.
 
-<hr>
-
 - [Skia-Python wrapper](https://github.com/kyamagu/skia-python), for a stable Python interface with the [Skia Graphics Library](https://skia.org).
   
   - Generates the base videos and piano roll mode graphics.
-
-<hr>
 
 - [FFmpeg, FFplay](https://ffmpeg.org), _"A complete, cross-platform solution to record, convert and stream audio and video."_ - and they are not lying!!
 
   - "The Only One". Transforms images into videos, adds sound, filters.
 
-<hr>
-
 - The [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) language, OpenGL, Vulkan (on mpv flag), the [Khronos group](https://www.khronos.org) on its entirety, seriously, you guys are awesome!!
 
   - Also the [Python wrapper](https://pypi.org/project/glfw/) for the [GLFW](https://www.glfw.org/) library for setting up an GL canvas so Skia can draw on.
-
-<hr>
 
 - The [Shady](https://github.com/polyfloyd/shady) project by [polyfloyd](https://github.com/polyfloyd/), for rendering or displaying Shadertoy-like syntax GLSL scripts.
   
@@ -195,45 +181,27 @@ I'll mainly list the main name and where to find more info, it's just impossible
   
   - I'd assume [Golang](https://golang.org/) as well for making Shady possible.
 
-<hr>
-
 ### Python packages and others involved
 
 - [SciPy](https://www.scipy.org/) and [NumPy](https://numpy.org/), the two must have packages on Python, very fast and flexible for scientific computing, lots of QOL functions.
   
   - Mainly used for calculating the FFTs and getting their frequencies domain representation.
-  
-<hr>
 
 - [audio2numpy](https://pypi.org/project/audio2numpy), [audioread](https://pypi.org/project/audioread), [soundfile](https://pypi.org/project/SoundFile) for reading an WAV, MP3, OGG and giving me the raw audio data.
 
-<hr>
-
 - [mido](https://pypi.org/project/mido/) for reading MIDI files, transforming ticks to seconds and other utilities for the piano roll visualization.
-
-<hr>
 
 - [OpenCV](https://opencv.org/) and [opencv-python](https://pypi.org/project/opencv-python/), for reading images of a video file without having to extract all of them in the start.
 
-<hr>
-
 - [pip-chill](https://pypi.org/project/pip-chill/) for simplifying the `requirements.txt`.
-
-<hr>
 
 - _Tom's Obvious, Minimal Language._: [Python interface](https://pypi.org/project/toml/), [main project](https://github.com/toml-lang/toml); _YAML Ain't Markup Language_: [Python interface](https://pypi.org/project/PyYAML/), [main project](https://yaml.org/): Both for reading / saving configuration files.
   
   - I dislike a bit JSON due to its kinda steep UX at first on fixing the syntax the end user itself, those two helps a lot on the overhaul UX on project I believe.
 
-<hr>
-
 - The [Python Image Library](https://pypi.org/project/Pillow/) Pillow, was extensively used in the past as a render backend but now it is used only for rotating images then sending to Skia.
 
-<hr>
-
 - Python package [samplerate](https://pypi.org/project/samplerate/) for a binding to libsamplerate, used for downsampling audio before calculating the FFT so we get more information on the lower frequencies.
-
-<hr>
 
 - [requests](https://pypi.org/project/requests/). [tqdm](https://pypi.org/project/tqdm), [wget](https://pypi.org/project/wget), [pyunpack](https://pypi.org/project/pyunpack/), [patool](https://pypi.org/project/patool/) for fetching, downloading, showing progress bars and extracting External dependencies automatically for the users.
 
@@ -241,11 +209,9 @@ I'll mainly list the main name and where to find more info, it's just impossible
 
 _(There are missing Python dependencies here, mostly others that these packages depends on, but micro managing would be very hard)_
 
-<hr>
-
 ### Extras
 
-The [Linux Foundation](https://linuxfoundation.org), contributors with code or money, every distribution I / you used, their package managers, developers, etc; For this amazing platform to develop on.
+The GNU/Linux operating system, contributors with code or money, every distribution I / you used, their package managers, developers, etc; For this amazing platform to develop on.
 
 The platforms MMV code is hosted on.
 
