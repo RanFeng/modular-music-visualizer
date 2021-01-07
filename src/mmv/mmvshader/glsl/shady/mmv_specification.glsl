@@ -25,6 +25,10 @@
 //
 // ===============================================================================
 
+// // Useful function
+
+// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+float rand(float n){return fract(sin(n) * 43758.5453123);}
 
 // Blit one image on the canvas, see function arguments
 vec4 mmv_blit_image(
@@ -61,24 +65,45 @@ vec4 mmv_blit_image(
     vec2 get_image_uv = (rotation_matrix * scale_mateix * (uv + anchor) * vec2(1.0, -1.0)) + shift;
 
     // If not repeat, check if any uv is out of bounds
-    if (! repeat) {
+    if (!repeat) {
         if (get_image_uv.x < 0.0) { return canvas; }
         if (get_image_uv.x > 1.0) { return canvas; }
         if (get_image_uv.y < 0.0) { return canvas; }
         if (get_image_uv.y > 1.0) { return canvas; }
     }
 
-    // Get the texture
-    vec4 imagepixel = textureLod(
-        image, get_image_uv, 1.0
-    );
+    // // Multi sampling for removing jagged edges
+    float center_intensity = 5.0;
+
+    // Get the texture (raw pixel, the center, non anti aliased)
+    vec4 imagepixel = texture2D(image, get_image_uv);
+    imagepixel *= center_intensity;
+
+    // // Multi sample config
+
+    // Distance of the uv texture on this pixel to averate out stuff
+    float lookup = (((1/iResolution.x) + (1/iResolution.y))/2.0) * 2.0;
+
+    // How many random pixels around to average
+    float many = 20;
+
+    // Constant
+    float tau = 3.1415*2;
+    vec4 multisampled = imagepixel;
+
+    // The vector we get the translated one given the rotation point
+    vec2 get_lookuped = vec2(0.0);
+
+    // Iterate
+    for (float i = 0.0; i < tau; i += tau / many) {{
+        // A random radially point
+        get_lookuped = get_image_uv + (vec2(rand(i), rand(i+1)) * lookup);
+        multisampled += texture2D(image, get_lookuped);
+    }}
+
+    imagepixel = multisampled / (many + center_intensity);
 
     // Return the texture
     return imagepixel;
 }
 
-
-// // Useful function
-
-// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
-float rand(float n){return fract(sin(n) * 43758.5453123);}

@@ -25,12 +25,9 @@
 //
 // ===============================================================================
 
-////START_MAPPING
-////END_MAPPING
+////ADD_MAPPING
 
 ////ADD_FUNCTIONS
-
-////ADD_LAYERS
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
@@ -51,7 +48,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // Note that the X will grow from - aspect ratio/2 to aspect ratio/2
     uv.x *= screen_ratio_x;
 
-    // Return final pixel, replace LAST_LAYER_FUNCTION with the last function
-    // of the layer on the chain.
-    fragColor = LAST_LAYER_FUNCTION(uv);
+    // The color we output in the end
+    vec4 col = vec4(0.0);
+
+    ////ADD_CONTENTS
+
+    // Return the color
+    fragColor = col;
 }

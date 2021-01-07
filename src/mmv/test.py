@@ -16,12 +16,10 @@ interface = mmv.MMVPackageInterface()
 # interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore"], platform = "windows")
 # interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore", "golang", "shady", "upgrade-shady"])
 interface.check_download_externals(target_externals = ["ffmpeg", "mpv", "musescore", "golang", "shady"])
-exit()
 
 # Shader interface >:)
 mmv_shader_interface = interface.get_shader_interface()
 shady = mmv_shader_interface.mmv_shader_main.shady
-shady_maker = mmv_shader_interface.mmv_shader_main.shady_shader_maker
 
 WIDTH = 1280
 HEIGHT = 720
@@ -30,6 +28,41 @@ supersampling = 1
 
 sep = os.path.sep
 
+global_shader = mmv_shader_interface.new_shady_shader()
+global_shader.empty_shader(shader_type = "global")
+
+# layer1 = mmv_shader_interface.new_shady_shader()
+# layer1.empty_shader(shader_type = "layer")
+# layer1.add_contents("col = vec4(uv.x, 0.0, 0.0, uv.x);")
+# layer1.save()
+
+layer2 = mmv_shader_interface.new_shady_shader()
+layer2.empty_shader(shader_type = "layer")
+layer2.add_mapping(name = "image", map_type = "image", path = f"{THIS_DIR}/../assets/tremx_assets/secret-image.png")
+
+target = "image"
+angle = "sin(iTime/2.2385)/50.0 + cos(iTime/3.49234)/60"
+shift_decrease = 80.0
+shift = f"vec2(sin(iTime*1.2353)/{shift_decrease}, sin(iTime*1.53489)/{shift_decrease} )"
+scale = "1.0 + sin(iTime)/40 + cos(iTime*1.13515)/50"
+repeat = "true"
+
+layer2.add_contents(
+    f"col = mmv_blit_image(col, {target}, {target}Size, uv, {shift}, vec2(0.5, 0.5), {scale}, {angle}, {repeat});"
+)
+layer2.camera_transformation("uv = uv * atan(iTime);")
+layer2.save()
+
+# # Add layers
+
+layers = [layer2]
+
+for layer in layers:
+    global_shader.add_alpha_composite_layer(shady_maker = layer, width = WIDTH, height = HEIGHT)
+
+global_shader.save()
+
+
 # #
 
 shady.base_configuration(
@@ -37,7 +70,7 @@ shady.base_configuration(
     width = int(WIDTH * supersampling),
     height = int(HEIGHT * supersampling),
     framerate = FRAMERATE,
-    main_glsl = f"{THIS_DIR}/mmvshader/glsl/shady/layer2.glsl",
+    main_glsl = global_shader.path,
 )
 
 # # Visualize / render
@@ -54,13 +87,13 @@ if "render" in sys.argv:
         output_video = f"{THIS_DIR}/../mmvshady.mp4",
         pix_fmt = "rgba",
         framerate = FRAMERATE,
-        preset = "fast",
+        preset = "slow",
         hwaccel = "auto",
         loglevel = "",
         nostats = False,
         hide_banner = True,
         opencl = False,
-        crf = 18,
+        crf = 23,
         tune = "film",
         vcodec = "libx264",
         override = True,
@@ -77,6 +110,7 @@ else:
         width = WIDTH,
         height = HEIGHT,
         pix_fmt = "rgba",  # rgba, rgb24, bgra
+        vflip = True,
         framerate = FRAMERATE,
     )
     shady.set_pipe_to(pipe_to = ffplay)

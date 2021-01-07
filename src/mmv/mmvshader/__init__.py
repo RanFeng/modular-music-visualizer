@@ -27,6 +27,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.common.cmn_constants import LOG_NEXT_DEPTH, PACKAGE_DEPTH, LOG_NO_DEPTH, LOG_SEPARATOR, STEP_SEPARATOR
+from mmv.mmvshader.mmv_shader_shady_maker import MMVShaderShadyMaker
 from mmv.mmvshader.mmv_shader_main import MMVShaderMain
 from mmv.common.cmn_tree import DisplayablePath
 from pathlib import Path
@@ -92,6 +93,9 @@ class MMVShaderInterface:
 
         logging.info(LOG_SEPARATOR)
 
+    def new_shady_shader(self):
+        return MMVShaderShadyMaker(mmv_shader_main = self.mmv_shader_main)
+        
     # List the shaders on the self.SHADERS_LOCATED_AT folder and also
     # reads every shader for pattern matching and printing available
     # options / settings

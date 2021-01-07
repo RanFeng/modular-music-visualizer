@@ -73,7 +73,7 @@ I also invite you to read about the [Free Software Definition / Philosophy](http
    * [Goals, what is being developed](#goals-what-is-being-developed)
    * [Contributing](#contributing)
    * [User Generated Content, legal](#user-generated-content-copyrighted-material-legal)
-   * [Acknowledgements | Thanks to](#acknowledgements-|-thanks-to)
+   * [Acknowledgements | Thanks to](#acknowledgements-thanks-to)
 
 <hr>
 
@@ -147,7 +147,7 @@ Any information, images, file names you configure manually is considered (by me)
 
 I give you a few "free assets" files, those, apart from the MMV logo I created myself on Inkscape, were generated with Python with some old code written by me, you can use them freely. Some are generated on the go if configured (they are on by default) on the running script of MMV.
 
-# Acknowledgements | Thanks to
+# Acknowledgements, Thanks to
 
 I want to show my grattitude to these projects, no joke, MMV wouldn't be possible if these projects didn't exist.
 

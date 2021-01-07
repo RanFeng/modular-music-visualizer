@@ -72,7 +72,3 @@ class MMVShaderMain:
         logging.info(f"{depth}{debug_prefix} Creating MMVShaderMPVMaker")
         logging.info(STEP_SEPARATOR)
         self.mpv_shader_maker = MMVShaderMPVMaker(self)
-
-        logging.info(f"{depth}{debug_prefix} Creating MMVShaderShadyMaker")
-        logging.info(STEP_SEPARATOR)
-        self.shady_shader_maker = MMVShaderShadyMaker(self)

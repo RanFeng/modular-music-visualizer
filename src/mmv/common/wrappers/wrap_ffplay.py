@@ -45,6 +45,7 @@ class FFplayWrapper:
         height: int,
         pix_fmt: str,  # rgba, rgb24, bgra
         framerate: int,
+        vflip = False,
         depth = LOG_NO_DEPTH,
     ) -> None:
 
@@ -60,6 +61,9 @@ class FFplayWrapper:
             "-f", "rawvideo",
             "-i", "-"
         ]
+
+        if vflip:
+            self.command += ["-vf", "vflip"]
 
         # Log the command for generating final video
         logging.info(f"{depth}{debug_prefix} FFplay command is: {self.command}")
