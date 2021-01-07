@@ -24,7 +24,7 @@
 - **Everything configurable.**
 
 <hr>
-Officially works on Linux with all features, most features working on macOS and Windows
+Officially works on Linux with all features, most work on macOS and some on Windows
 <hr>
 
 ## Showcase

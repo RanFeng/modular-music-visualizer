@@ -4,7 +4,11 @@ Ubuntu was the easiest one to get it up and running, a little bit less trouble c
 
 As long as you have a working Python + dependencies, FFmpeg binaries and a OpenGL capable GPU or can make a GLFW context on the CPU you should be ok running this.
 
-Also install optional dependency `mpv` for a post processing interface.
+Also install optional dependency `mpv` for a post processing interface, see their [installation guide](https://mpv.io/installation/)
+
+For musescore visit their [downloads guide](https://musescore.org/en/download#Linux)
+
+Search on installing Golang for your distro if you want to use MMVShaderShady, and probably the `mesa` package for `egl`, don't know if it's included in NVIDIA drivers or how it'll work, please report back.
 
 <hr>
 <p align="center">
@@ -17,7 +21,7 @@ Also install optional dependency `mpv` for a post processing interface.
 
   - Python 3.8 (recommended): `sudo pacman -Syu python38 ffmpeg git`
   
-  - (optional) `sudo pacman -Syu mpv`
+  - (optional) `sudo pacman -Syu mpv go musescore`
 
 <p>
 
@@ -28,6 +32,7 @@ Also install optional dependency `mpv` for a post processing interface.
   - `sudo apt install python3 python3-venv python3-dev python3-setuptools python3-pip ffmpeg git libglfw3 libglfw3-dev build-essential` 
 
   - (optional) `sudo apt install mpv`
+
 <p>
 
 - **Fedora**: *Tested on Fedora Workstation 33 clean installation as of nov/2020*
@@ -83,14 +88,9 @@ Preferably use a virtual environment:
 
 - `source ./mmv-venv/bin/activate` (activate the venv)
 
-Then run `python base_video.py --auto-deps`
+Install Python dependencies:
 
-It should install Python dependencies automatically, if not run `pip install -r ./mmv/requirements.txt`
+- `python -m pip install ./mmv/requirements.txt`
 
-MMV should then run and generate the default video with default preset under the `renders` directory.
+Now head back to the original [RUNNING.md](RUNNING.md) for instructions on configuring / running, this file was for installing the dependencies.
 
-You can also run with `python base_video.py mode=[music,piano]` for quickly changing between the two. (mode=music is already implied if no argument is given)
-
-Can also configure first then run `python post_processing.py` for applying some shaders to the output (mpv dependency required)
-
-Head back to the original [RUNNING.md](RUNNING.md) for instructions on configuring your own stuff

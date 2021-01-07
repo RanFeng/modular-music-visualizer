@@ -12,80 +12,23 @@ This project isn't extensively tested on Windows, feedback appreciated.
 
 Any easier steps for Windows are welcome specially for external installs other than Python that are needed.
 
-**Chose:**
+##### Vanilla Python (discouraged somehow, high entropy)
 
-<hr>
+Don't be afraid to search how / why stuff broke because it will at some point.
 
-##### 1. With Anaconda (less trouble)
-
-Download and install `Anaconda` (not `miniconda`), make it your default Python optimally on the installer.
-
-<hr>
-
-##### 2. With vanilla Python (discouraged somehow)
+You can run the file `/src/bootstrap/windows/install_python.bat` and it should™ work.
 
 Head over to [Python Releases for Windows](https://www.python.org/downloads/windows/), download a _"Windows x86-64 executable installer"_ (I currently use Python 3.8), install it (be sure to check _"ADD PYTHON TO PATH"_ option on the installer).
 
-You'll also need to download `Build Tools for Visual Studio` which got merged into Visual Studio Community Edition, so search that (Build Tools for VS) and download the installer of the VS Community.
-
-You'll need to install the whole C++ development package group so Python can use a compiler and the Windows SDK for building dependencies such as numpy. This will use quite a bit of disk space and definitely will take a while to complete. After that you can proceed to the next steps.
-
-Search for `scipy` Python wheels and install the version listed on `requirements.txt`.
-
-For this last step you can also manage to install lapack or blas / openblas on your system. I could not. This is finicky and I offer no official support for this.
-
-<hr>
-
 ### Important: extra step for an automatic installation of dependencies
+
+Either run `/src/bootstrap/windows/install_dependencies.bat` or continue reading. You'll mostly like only need FFmpeg from the Externals as the MMVSkia sub package is the only one that works consistently on Windows as far as I know, I'd say run this just in case but don't hesitate in skipping and manually moving stuff..
 
 Go to [7-zip downloads](https://www.7-zip.org/download.html) website, download the `7-Zip for 64-bit Windows x64 (Intel 64 or AMD64)` executable if you don't have it already installed, run it and extract the files on the default path.
 
-
 This step is required to extract the video encoder (FFmpeg) compressed files if you don't want to do this by hand.
 
-<hr>
-
-### Getting the source code
-
-<hr>
-
-**Chose:**
-
-#### 1. GitHub / GitLab repository main page
-
-You might be already here, head to the top page and there is a (green for GitHub, blue for GitLab) button _"⬇️ Code"_ and download as a ZIP.
-
-Use a archive manager (something like 7-zip or rar) to extract the contents into a folder you'll be running MMV.
-
-#### 2. Using git CLI
-
-Install git  Windows the installer from [git downloads page](https://git-scm.com/downloads)
-
-Open a shell on desired dir to clone the repo (GIT bash shell on Windows)
-
-`git clone https://github.com/Tremeschin/modular-music-visualizer`
-
-<hr>
-
-### If running with Anaconda
-
-Open the Anaconda shell from start menu, then we'll create an conda environment and activate it:
-
-- `conda create --name mmv python=3.8`
-
-- `conda activate mmv`
-
-Now with basic CLI navigation commands, change to the directory you extracted or downloaded MMV, if it's on your Downloads folder, when executing the anaconda shell you should be at `C:\\users\your_user` so run:
-
-- `cd .\Downloads\modular-music-visualizer-master\mmv`
-
-Or just take the path on Windows Explorer and do:
-
-- `cd "C:\\path\to\mmv\with\ugly\back\slashes"`
-
-<hr>
-
-### If running with vanilla Python
+### Virtual environment for isolating Python packages
 
 Open a shell on the downloaded and extracted folder
 
@@ -97,35 +40,25 @@ This step is not required but good to do so, create an virtual environment (venv
 
 - `python.exe -m venv mmv-venv`
 
-- `.\venv-path\Scripts\activate.bat`
+- `source .\venv-path\Scripts\activate.bat`
 
-<hr>
+You'd then have to source the `activate.bat` every time you wish to run MMV again, just point it to the right directory relative on where your shell is opened..
 
-**Chose:**
+#### Automatic installation and running
 
-#### 1. Vanilla Python: automatic installation and running
+Install Python dependencies with `pip install -r .\mmv\requirements.txt`
 
-When you run `python .\base_video.py --auto-deps` it should take care of downloading and installing Python dependencies as well as FFmpeg, mpv and musescore as needed by working on the externals folders, moving the binary to the right place.
-
-If you're on anaconda, perhaps running with `--user` as so: `python .\base_video.py --auto-deps --user` should fix permission errors.
+When you run `python .\base_video.py` it should take care of downloading and moving FFmpeg, mpv and musescore as needed by working on the externals folders, moving the binary to the right place.
 
 If this process doesn't work (dead links for example), report any issue you had. You can also continue reading this for manual instructions.
 
-<hr>
-
-#### 2. Vanilla Python: manual FFmpeg and Python deps installation
+#### Manual FFmpeg and Python deps installation
 
 Download a compiled FFmpeg [build](https://ffmpeg.org/download.html#build-windows), the binary named `ffmpeg.exe` must be on the directory `ROOT/mmv_skia/mmv/externals/ffmpeg.exe`.
 
 Install Python dependencies with `pip install -r .\mmv\requirements.txt`
 
 Run MMV with `python .\base_video.py`
-
-<hr>
-<p align="center">
-  <i>Either by following path 1 or 2 you should have your final default video on the `renders` folder after running `base_video.py` script.</i>
-</p>
-<hr>
 
 # Post processing
 
@@ -134,3 +67,7 @@ You can't render videos out of this but only visualize real time
 Edit the file `post_processing.py` then run it. Don't set a target output video, comment the line by adding a # at the beginning.
 
 Head back to the original [RUNNING.md](RUNNING.md) for instructions on configuring your own stuff
+
+# MMVShaderShady
+
+Find a way to install polyfloyd's [Shady](https://github.com/polyfloyd/shady) project on Windows then report back.. couldn't make `pkg-config` of Cygwin to find `egl`.

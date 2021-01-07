@@ -12,15 +12,21 @@ I am very inexperienced with macOS but here's the steps I had to do for getting 
 
 - After it's installed, run `brew install ffmpeg python` to install Python (3.8 was what I got) and FFmpeg (the video encoder)
 
+Don't know if it's available the two but if you want to convert MIDI -> audio `brew install musescore`
+
+Don't know if this is the right way but maybe install the Golang with `brew install go` if you wish to run the next level experimental MMVShaders.
+
 I already had `git` so just do:
 
 - `git clone https://github.com/Tremeschin/modular-music-visualizer`
 
 - `cd ./modular-music-visualizer/src`
 
-Then run `python3 base_video.py --auto-deps --user`
+Install python deps:
 
-If you want it automatically to convert `MIDI -> audio` please also run `brew install fluidsynth --with-libsndfile`
+- `python3 -m pip install -r ./mmv/requirements.txt`
+
+Then run `python3 base_video.py`
 
 I did get a few OpenGL errors when doing this as I was using a mac VM with the scripts of this repo: https://github.com/foxlet/macOS-Simple-KVM
 
