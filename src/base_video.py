@@ -120,6 +120,10 @@ mmv_skia_interface.quality(
     # width = 1280,
     # height = 720,
 
+    # # [SD 480p]
+    # width = 854,
+    # height = 480,
+
     # # # [ Common FPS values ] # # #
 
     # fps = 240,
@@ -308,30 +312,6 @@ else:
     VIGNETTING = True
 
 
-# By default we store the videos in this RENDER_DIR, create it if it doesn't exist
-RENDER_DIR = THIS_FILE_DIR + "/renders"
-mmv_skia_interface.make_directory_if_doesnt_exist(RENDER_DIR)
-
-# Where we'll output the video
-# You can set like OUTPUT_VIDEO = "mmv_output.mkv"
-# I recommend MKV because if something fails you don't lose the footage,
-# the MP4 containers we must finish the pipe process for it to be readable
-# Set this to "auto" for automatic file name, as seen on following conditional.
-OUTPUT_VIDEO = "auto"
-
-if OUTPUT_VIDEO == "auto":
-    now = datetime.datetime.now()
-    date_and_time = now.strftime("%Y-%m-%d_%H-%M-%S")  # Don't put ":"" here, Windows doesn't like it, took a while to figure lol
-    OUTPUT_VIDEO = (
-        RENDER_DIR + "/"
-        f"mmv_{date_and_time}_"
-        f"mode-{MODE}_"
-        f"fps-{mmv_skia_interface.mmv_skia_main.context.fps}_"
-        f"{os.path.splitext(os.path.basename(INPUT_AUDIO))[0]}"  # Filename of the audio without extension
-        ".mkv"
-    )
-
-
 # # Configurations on some modules, presets
 
 """
@@ -343,66 +323,125 @@ PARTICLES_PRESET = "middle_out"
 # PARTICLES_PRESET = "bottom_mid_top"
 
 
-# # Video encoding
+# Want to test a preset how it looks before rendering to a file? set this to "realtime"
+# so we output the generated images to FFplay instead of FFmpeg. This by far probably
+# won't be realtime at all unless you set an target framerate to something like 24 fps
+# and at a lower resolution (720p). Python is kinda slow for this task of keeping up
+# with the job, and also the audio processing doesn't help much since it's about realtime
+# only (70fps~ ish at target 60fps). This is mostly experimental.
 
-video_encoder = interface.get_ffmpeg_wrapper()
-video_encoder.configure_encoding(
-    ffmpeg_binary_path = interface.find_binary("ffmpeg"),
-    width = mmv_skia_interface.width,
-    height = mmv_skia_interface.height,
-    input_audio_source = INPUT_AUDIO,
-    input_video_source = "pipe",
-    output_video = OUTPUT_VIDEO,
-    pix_fmt = "rgba",
-    framerate = mmv_skia_interface.fps,
+# VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "video"
+VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "realtime"
 
-    # Encoder preset, possible values are:
-    #  > ["placebo", "veryslow", "slowest", "slow",
-    #     "medium", "fast", "faster", "veryfast",
-    #     "superfast", "ultrafast"]
-    #
-    # Slower presets yields a higher quality encoding but utilize more CPU,
-    # since MMVSkia is by no means no realtime, a slow preset should be enough since
-    # the FFmpeg process is run in parallel. 
-    preset = "slow",
 
-    # Try utilizing hardware acceleration? Set to None for ignoring this
-    hwaccel = "auto",
+if VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "video":
 
-    # Don't overflow the subprocess buffer
-    loglevel = "panic",
-    nostats = True,
-    hide_banner = True,
+    # By default we store the videos in this RENDER_DIR, create it if it doesn't exist
+    RENDER_DIR = THIS_FILE_DIR + "/renders"
+    mmv_skia_interface.make_directory_if_doesnt_exist(RENDER_DIR)
 
-    # If True adds "-x264opts opencl" to the FFmpeg command. Can make FFmpeg have a
-    # startup time of a few seconds, will disable for compatibility since not everyone
-    # have opencl loaders, etc.
-    opencl = False,
+    # Where we'll output the video
+    # You can set like OUTPUT_VIDEO = "mmv_output.mkv"
+    # I recommend MKV because if something fails you don't lose the footage,
+    # the MP4 containers we must finish the pipe process for it to be readable
+    # Set this to "auto" for automatic file name, as seen on following conditional.
+    OUTPUT_VIDEO = "auto"
 
-    # Constant Rate Factor of x264 or x265 encoding, 0 is lossless, 51 is the worst,
-    # 23 the the default. Low values means higher quality and bigger file size
-    crf = 17,
+    if OUTPUT_VIDEO == "auto":
+        now = datetime.datetime.now()
+        date_and_time = now.strftime("%Y-%m-%d_%H-%M-%S")  # Don't put ":"" here, Windows doesn't like it, took a while to figure lol
+        OUTPUT_VIDEO = (
+            RENDER_DIR + "/"
+            f"mmv_{date_and_time}_"
+            f"mode-{MODE}_"
+            f"fps-{mmv_skia_interface.mmv_skia_main.context.fps}_"
+            f"{os.path.splitext(os.path.basename(INPUT_AUDIO))[0]}"  # Filename of the audio without extension
+            ".mkv"
+        )
 
-    # Tune video encoder for:
-    # "film":       Mostly IRL stuff, shouldn't hurt letting this default
-    # "animation":  Animes in general, we use this default as
-    # "grain":      Optimized for old / grainy contents for preserving it
-    # "fastdecode": For low compute power devices to have less trouble with
-    tune = "film",
+    # # Video encoding
 
-    vcodec = "libx264",
-    override = True,
-)
+    video_encoder = interface.get_ffmpeg_wrapper()
+    video_encoder.configure_encoding(
+        ffmpeg_binary_path = interface.find_binary("ffmpeg"),
+        width = mmv_skia_interface.width,
+        height = mmv_skia_interface.height,
+        input_audio_source = INPUT_AUDIO,
+        input_video_source = "pipe",
+        output_video = OUTPUT_VIDEO,
+        pix_fmt = "rgba",  # If you get swapped red and blue color channels try setting this to bgra
+        framerate = mmv_skia_interface.fps,
 
-# Set the encoder
-mmv_skia_interface.set_mmv_skia_video_encoder(
-    ffmpeg = video_encoder    
-)
+        # Encoder preset, possible values are:
+        #  > ["placebo", "veryslow", "slowest", "slow",
+        #     "medium", "fast", "faster", "veryfast",
+        #     "superfast", "ultrafast"]
+        #
+        # Slower presets yields a higher quality encoding but utilize more CPU,
+        # since MMVSkia is by no means no realtime, a slow preset should be enough since
+        # the FFmpeg process is run in parallel. 
+        preset = "slow",
 
+        # Try utilizing hardware acceleration? Set to None for ignoring this
+        hwaccel = "auto",
+
+        # Don't overflow the subprocess buffer
+        loglevel = "panic",
+        nostats = True,
+        hide_banner = True,
+
+        # If True adds "-x264opts opencl" to the FFmpeg command. Can make FFmpeg have a
+        # startup time of a few seconds, will disable for compatibility since not everyone
+        # have opencl loaders, etc.
+        opencl = False,
+
+        # Constant Rate Factor of x264 or x265 encoding, 0 is lossless, 51 is the worst,
+        # 23 the the default. Low values means higher quality and bigger file size
+        crf = 17,
+
+        # Tune video encoder for:
+        # "film":       Mostly IRL stuff, shouldn't hurt letting this default
+        # "animation":  Animes in general, we use this default as
+        # "grain":      Optimized for old / grainy contents for preserving it
+        # "fastdecode": For low compute power devices to have less trouble with
+        tune = "film",
+
+        vcodec = "libx264",
+        override = True,
+    )
+
+    # Set the encoder
+    mmv_skia_interface.pipe_video_to(
+        pipe_video_to = video_encoder    
+    )
+
+# View the video "realtime"
+elif VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "realtime":
+
+    # Get the FFplay wrapper
+    ffplay = interface.get_ffplay_wrapper()
+
+    # Configure it on what we expect , width height and framerate
+    ffplay.configure(
+        ffplay_binary_path = interface.find_binary("ffplay"),
+        width = mmv_skia_interface.width,
+        height = mmv_skia_interface.height,
+        pix_fmt = "rgba",  # If you get swapped red and blue color channels try setting this to bgra
+        vflip = False,
+        framerate = mmv_skia_interface.fps,
+    )
+
+    # Set where we'll pipe the final images to
+    mmv_skia_interface.pipe_video_to(pipe_video_to = ffplay)
+
+    # Start the FFplay subprocess
+    ffplay.start()
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # You can configure the other stuff as follow, better to look at their
 # functions on what they do first
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -465,7 +504,10 @@ mmv_skia_interface.audio_processing.preset_balanced()
 
 # I/O options, input a audio, output a video
 mmv_skia_interface.input_audio(INPUT_AUDIO)
-mmv_skia_interface.output_video(OUTPUT_VIDEO)
+
+# Can only set output video if rendering to a video file
+if VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "video":
+    mmv_skia_interface.output_video(OUTPUT_VIDEO)
 
 if (MODE == "piano_roll"):
     mmv_skia_interface.input_midi(INPUT_MIDI)

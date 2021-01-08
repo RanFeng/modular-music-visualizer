@@ -110,7 +110,7 @@ class MMVSkiaInterface:
         logging.info(LOG_SEPARATOR)
 
         self.configure_mmv_skia_main()
-        self.CONFIGURED_FFMPEG = False
+        self.CONFIGURED_PIPE_VIDEO_TO = False
 
         # Quit if code flow says so
         if self.prelude["flow"]["stop_at_interface_init"]:
@@ -126,17 +126,17 @@ class MMVSkiaInterface:
         self.mmv_skia_main.context.max_images_on_pipe_buffer = kwargs.get("max_images_on_pipe_buffer", 20)
 
     # Set MMVSkiaMain's ffmpeg attribute to the one the user configured
-    def set_mmv_skia_video_encoder(self, ffmpeg, depth = PACKAGE_DEPTH):
-        debug_prefix = "[MMVSkiaInterface.set_mmv_skia_video_encoder]"
+    def pipe_video_to(self, pipe_video_to, depth = PACKAGE_DEPTH):
+        debug_prefix = "[MMVSkiaInterface.set_pipe_video_to]"
         ndepth = depth + LOG_NEXT_DEPTH
         logging.info(LOG_SEPARATOR)
 
         # Log action
-        logging.info(f"{depth}{debug_prefix} Set FFmpeg wrapper to MMVSkiaMain")
+        logging.info(f"{depth}{debug_prefix} Set pipe to wrapper to MMVSkiaMain")
 
         # Assign
-        self.mmv_skia_main.ffmpeg = ffmpeg
-        self.CONFIGURED_FFMPEG = True
+        self.mmv_skia_main.pipe_video_to = pipe_video_to
+        self.CONFIGURED_PIPE_VIDEO_TO = True
 
     # Execute MMV with the configurations we've done
     def run(self, depth = PACKAGE_DEPTH) -> None:
@@ -145,7 +145,7 @@ class MMVSkiaInterface:
         logging.info(LOG_SEPARATOR)
 
         # Can't continue
-        if not self.CONFIGURED_FFMPEG:
+        if not self.CONFIGURED_PIPE_VIDEO_TO:
             logging.critical(f"{depth}{debug_prefix} You have not run the function set_mmv_skia_encoder, please send a configured FFmpegWrapper class to it.")
             sys.exit(-1)
 

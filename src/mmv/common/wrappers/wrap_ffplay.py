@@ -46,6 +46,7 @@ class FFplayWrapper:
         pix_fmt: str,  # rgba, rgb24, bgra
         framerate: int,
         vflip = False,
+        quiet = True,
         depth = LOG_NO_DEPTH,
     ) -> None:
 
@@ -65,12 +66,26 @@ class FFplayWrapper:
         if vflip:
             self.command += ["-vf", "vflip"]
 
+        if quiet:
+            self.command += ["-loglevel", "panic", "-hide_banner"]
+
+    
+
         # Log the command for generating final video
         logging.info(f"{depth}{debug_prefix} FFplay command is: {self.command}")
       
     def pipe_images_to_video(self):
         pass
+
+    def pipe_writer_loop(self):
+        pass
     
+    def write_to_pipe(self, index, image):
+        self.subprocess.stdin.write(image)
+
+    def close_pipe(self):
+        self.subprocess.stdin.close()
+
     def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
         debug_prefix = "[FFplayWrapper.start]"
         ndepth = depth + LOG_NEXT_DEPTH

@@ -68,7 +68,7 @@ class FFmpegWrapper:
         depth = LOG_NO_DEPTH,
     ) -> None:
 
-        debug_prefix = "[FFmpegWrapper.configure_pipe_images_to_video]"
+        debug_prefix = "[FFmpegWrapper.configure_encoding]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         # Generate the command for piping images to
@@ -159,8 +159,8 @@ class FFmpegWrapper:
         # Log the command for generating final video
         logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.command}")
       
-    def pipe_images_to_video(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
-        debug_prefix = "[FFmpegWrapper.pipe_images_to_video]"
+    def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
+        debug_prefix = "[FFmpegWrapper.start]"
         ndepth = depth + LOG_NEXT_DEPTH
 
         logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess with command {self.command}")

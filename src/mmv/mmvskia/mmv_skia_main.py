@@ -84,7 +84,7 @@ class MMVSkiaMain:
 
         # The user must explicitly set and override this, mostly for compatibility
         # and code cleanup reasons.
-        self.ffmpeg = None
+        self.pipe_video_to = None
 
         logging.info(f"{depth}{debug_prefix} Creating AudioFile() class")
         self.audio = AudioFile()
@@ -116,14 +116,14 @@ class MMVSkiaMain:
             # p.dump_stats("res.prof")
         except KeyboardInterrupt:
             self.skia.terminate_glfw()
-            self.ffmpeg.close_pipe()
+            self.pipe_video_to.close_pipe()
             sys.exit(-1)
         
         # Say thanks message
         self.mmvskia_interface.top_level_interace.thanks_message()
 
         # Wait for FFmpeg pipe to stop
-        while not self.ffmpeg.stop_piping:
+        while not self.pipe_video_to.stop_piping:
             time.sleep(0.05)
 
         logging.info(f"{depth}{debug_prefix} Quitting Python")

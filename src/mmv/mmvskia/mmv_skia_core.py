@@ -71,7 +71,7 @@ class MMVSkiaCore:
         ONLY_PROCESS_AUDIO = self.prelude["flow"]["only_process_audio"]
         logging.info(f"{depth}{debug_prefix} Only process audio: [{ONLY_PROCESS_AUDIO}]")
 
-        # Read the audio and start FFmpeg pipe
+        # Read the audio and start pipe_video_to pipe
         logging.info(f"{depth}{debug_prefix} Read audio file")
         self.mmvskia_main.audio.read(path = self.mmvskia_main.context.input_audio_file, depth = ndepth)
         
@@ -87,13 +87,13 @@ class MMVSkiaCore:
         if not ONLY_PROCESS_AUDIO:
            
             # Start video pipe
-            logging.info(f"{depth}{debug_prefix} Starting FFmpeg Pipe")
-            self.mmvskia_main.ffmpeg.pipe_images_to_video()
+            logging.info(f"{depth}{debug_prefix} Starting pipe_video_to process")
+            self.mmvskia_main.pipe_video_to.start()
 
             # Create pipe writer thread
             logging.info(f"{depth}{debug_prefix} Creating pipe writer thread")
             self.pipe_writer_loop_thread = threading.Thread(
-                target = self.mmvskia_main.ffmpeg.pipe_writer_loop,
+                target = self.mmvskia_main.pipe_video_to.pipe_writer_loop,
                 args = (
                     self.mmvskia_main.audio.duration,
                     self.mmvskia_main.context.fps,
@@ -103,7 +103,7 @@ class MMVSkiaCore:
                 daemon = True,
             )
 
-            # Start the thread to write images onto FFmpeg
+            # Start the thread to write images onto pipe_video_to
             logging.info(f"{depth}{debug_prefix} Starting pipe writer thread")
             self.pipe_writer_loop_thread.start()
 
@@ -234,7 +234,7 @@ class MMVSkiaCore:
 
             # # # [ Next steps ] # # #
 
-            # Don't draw anything or pipe to FFmpeg if we're only processing the audio
+            # Don't draw anything or pipe to pipe_video_to if we're only processing the audio
             if not ONLY_PROCESS_AUDIO:
                 
                 # Reset skia canvas
@@ -254,8 +254,8 @@ class MMVSkiaCore:
 
                 # Save current canvas's Frame to the final video, the pipe writer thread will actually pipe it
                 if LOG_NEXT_STEPS:
-                    logging.debug(f"{depth}{debug_prefix} Write image to FFmpeg pipe index [{global_frame_index}]")
-                self.mmvskia_main.ffmpeg.write_to_pipe(global_frame_index, next_image)
+                    logging.debug(f"{depth}{debug_prefix} Write image to pipe_video_to pipe index [{global_frame_index}]")
+                self.mmvskia_main.pipe_video_to.write_to_pipe(global_frame_index, next_image)
             
             else:  # QOL print what is happening
                 print(f"\rOnly process audio [{global_frame_index} / {self.mmvskia_main.context.total_steps}", end="")
@@ -265,7 +265,7 @@ class MMVSkiaCore:
             self.mmvskia_main.skia.terminate_glfw()
         else:
             logging.info(f"{depth}{debug_prefix} Call to close pipe, let it wait until it's done")
-            self.mmvskia_main.ffmpeg.close_pipe()
+            self.mmvskia_main.pipe_video_to.close_pipe()
 
         # Update the TOML with the new data
         if WRITE_AUDIO_AMPLITUDE_VALUES_TO_LAST_SESSION_INFO:
