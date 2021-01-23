@@ -23,5 +23,5 @@ python.exe -m pip install --upgrade pip wheel --user
 echo "Installing MMV Python dependencies"
 python.exe -m pip install -r "..\..\mmv\requirements.txt" --user
 
-echo "Installing every dependency we'll need. This will likely fail missing patool because pip just will refuse installing on C:\Program Files even with admin permissions when I tried, and Python installer just won't add the appdata local roaming python folder to PATH automatically since that is user stuff, hence why we use a virtualenv before. Consider also restarting the shell after installing Golang otherwise it will not find the go.exe binary. Oh, and also, can't isntall shady because installing egl is just pain and unstable even on msys2, cygwin and have to add and micro manage those on PATH for it to even find the stuff. For running MMVSkia only FFmpeg is required and you probably can skip this."
+echo "Installing every dependency we'll need (hopefully)"
 python.exe ".\get_externals.py"

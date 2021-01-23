@@ -34,7 +34,7 @@ float rand(float n){return fract(sin(n) * 43758.5453123);}
 vec4 mmv_blit_image(
         in vec4 canvas,     // Return this if out of bounds and repeat = false
         in sampler2D image, // The texture
-        in vec2 image_resolution,  // As Shady adds {mapping}Size for the ratios, give those
+        in vec2 image_resolution,  // For ratios
         in vec2 uv,         // UV we're getting (usually the layer's uv)
         in vec2 anchor,     // Anchor the rotation on the screen in some point
         in vec2 shift,      // Shift the image (for example vec2(0.5, 0.5) will rotate around the center)

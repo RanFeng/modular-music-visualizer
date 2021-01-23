@@ -35,7 +35,6 @@ src/mmv/release
 src/mmv/mmvshader/glsl/st
 
 src/mmv/data/last_session_info.toml
-src/mmv/mmvshader/shady
 
 # # Tremx logos Yeah this is my identity, you should use yours here :)
 src/mmvskia/assets/tremx_assets
