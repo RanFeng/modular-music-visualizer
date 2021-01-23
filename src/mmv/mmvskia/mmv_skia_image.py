@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -27,7 +27,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.mmvskia.mmv_skia_image_configure import MMVSkiaImageConfigure
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 from mmv.mmvskia.mmv_skia_modifiers import *
 from mmv.common.cmn_frame import Frame
 import logging
@@ -39,19 +39,19 @@ import cv2
 
 # Basically everything on MMV as we have to render images
 class MMVSkiaImage:
-    def __init__(self, mmvskia_main, depth = LOG_NO_DEPTH, from_generator = False) -> None:
+    def __init__(self, mmvskia_main, from_generator = False) -> None:
         debug_prefix = "[MMVSkiaImage.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         self.mmvskia_main = mmvskia_main
         self.preludec = self.mmvskia_main.prelude["mmvimage"]
 
         # Log the creation of this class
         if self.preludec["log_creation"] and not from_generator:
-            logging.info(f"{depth}{debug_prefix} Created new MMVSkiaImage object, getting unique identifier for it")
+            logging.info(f"{debug_prefix} Created new MMVSkiaImage object, getting unique identifier for it")
 
         # Get an unique identifier for this MMVSkiaImage object
         self.identifier = self.mmvskia_main.utils.get_unique_id(
-            purpose = "MMVSkiaImage object", depth = ndepth,
+            purpose = "MMVSkiaImage object",
             silent = self.preludec["log_get_unique_id"] and from_generator
         )
         
@@ -80,16 +80,15 @@ class MMVSkiaImage:
 
         self.ROUND = 3
         
-        self._reset_effects_variables(depth = ndepth)
+        self._reset_effects_variables()
 
     # Clean this MMVSkiaImage's todo processing or applied
-    def _reset_effects_variables(self, depth = LOG_NO_DEPTH):
+    def _reset_effects_variables(self):
         debug_prefix = "[MMVSkiaImage._reset_effects_variables]"
-        ndepth = depth + LOG_NEXT_DEPTH
         
         # Log action
         if self.preludec["_reset_effects_variables"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Resetting effects variables (filters on image, mask, shaders, paint)")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Resetting effects variables (filters on image, mask, shaders, paint)")
         
         self.image_filters = []
         self.mask_filters = []
@@ -102,55 +101,52 @@ class MMVSkiaImage:
     # Our Canvas is an MMVSkiaImage object so we reset it, initialize the animation layers automatically, bla bla
     # we don't need the actual configuration from the user apart from post processing accesses by this
     # MMVSkiaImage's MMVSkiaImageConfigure class
-    def create_canvas(self, depth = LOG_NO_DEPTH) -> None:
+    def create_canvas(self) -> None:
         debug_prefix = "[MMVSkiaImage.create_canvas]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["create_canvas"]["log_action"]:
-            logging.info(f"{depth}{debug_prefix} [{self.identifier}] Create empty canvas (this ought be the video canvas?)")
+            logging.info(f"{debug_prefix} [{self.identifier}] Create empty canvas (this ought be the video canvas?)")
 
         # Will we be logging the steps?
         log_steps = self.preludec["create_canvas"]["log_steps"]
 
         # Initialize blank animation layer
         if log_steps:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Init animation layer")
-        self.configure.init_animation_layer(depth = ndepth)
+            logging.debug(f"{debug_prefix} [{self.identifier}] Init animation layer")
+        self.configure.init_animation_layer()
         
         # Reset the canvas, create new image of Contex's width and height
         if log_steps:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Reset canvas")
-        self.reset_canvas(depth = ndepth)
+            logging.debug(f"{debug_prefix} [{self.identifier}] Reset canvas")
+        self.reset_canvas()
         
         # Add Path Point at (0, 0)
         if log_steps:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add required static path of type Point at (x, y) = (0, 0)")
-        self.configure.add_path_point(x = 0, y = 0, depth = ndepth)
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add required static path of type Point at (x, y) = (0, 0)")
+        self.configure.add_path_point(x = 0, y = 0)
     
     # Create empty zeros canvas IMAGE, not CONTENTS.
     # If we ever wanna mirror the contents and apply post processing
-    def reset_canvas(self, depth = LOG_NO_DEPTH) -> None:
+    def reset_canvas(self) -> None:
         debug_prefix = "[MMVSkiaImage.reset_canvas]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Hard debug, this should be executed a lot and we don't wanna clutter the log file or stdout
         if self.preludec["reset_canvas"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Reset canvas, create new image of Context's width and height in size")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Reset canvas, create new image of Context's width and height in size")
             
         # Actually create the new canvas
         self.image.new(self.mmvskia_main.context.width, self.mmvskia_main.context.height)
 
     # Next step of animation
-    def next(self, depth = LOG_NO_DEPTH) -> None:
+    def next(self) -> None:
         debug_prefix = "[MMVSkiaImage.next]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Next step
         self.current_step += 1
 
         if self.preludec["next"]["log_current_step"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Next step, current step = [{self.current_step}]")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Next step, current step = [{self.current_step}]")
 
         # Animation has ended, this current_animation isn't present on path.keys
         if self.current_animation not in list(self.animation.keys()):
@@ -158,7 +154,7 @@ class MMVSkiaImage:
         
             # Log we are marked to be deleted
             if self.preludec["next"]["log_became_deletable"]:
-                logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Object is out of animation, marking to be deleted")
+                logging.debug(f"{debug_prefix} [{self.identifier}] Object is out of animation, marking to be deleted")
 
             return
 
@@ -220,7 +216,7 @@ class MMVSkiaImage:
                 )
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Video module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Video module .next() took [{time.time() - s:.010f}]")
 
             if "rotate" in modules:
                 s = time.time()
@@ -237,7 +233,7 @@ class MMVSkiaImage:
                     self.rotate_value = amount
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Rotate module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Rotate module .next() took [{time.time() - s:.010f}]")
 
             if "resize" in modules:
                 s = time.time()
@@ -259,7 +255,7 @@ class MMVSkiaImage:
                         self.offset[1] += offset[1]
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Resize module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Resize module .next() took [{time.time() - s:.010f}]")
 
             # DONE
             if "blur" in modules:
@@ -277,7 +273,7 @@ class MMVSkiaImage:
                 )
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Blur module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Blur module .next() took [{time.time() - s:.010f}]")
             
             if "fade" in modules:
                 s = time.time()
@@ -290,7 +286,7 @@ class MMVSkiaImage:
                 self.image.transparency( fade.get_value() )
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Fade module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Fade module .next() took [{time.time() - s:.010f}]")
                     
             # Apply vignetting
             if "vignetting" in modules:
@@ -315,7 +311,7 @@ class MMVSkiaImage:
                 })
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Vignetting module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Vignetting module .next() took [{time.time() - s:.010f}]")
 
             
             if "vectorial" in modules:
@@ -334,10 +330,10 @@ class MMVSkiaImage:
                 vectorial.next(effects)
 
                 if self.preludec["next"]["debug_timings"]:
-                    logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Vectorial module .next() took [{time.time() - s:.010f}]")
+                    logging.debug(f"{debug_prefix} [{self.identifier}] Vectorial module .next() took [{time.time() - s:.010f}]")
 
             if self.preludec["next"]["debug_timings"]:
-                logging.debug(f"{depth}{debug_prefix} [{self.identifier}] Global .next() took [{time.time() - sg:.010f}]")
+                logging.debug(f"{debug_prefix} [{self.identifier}] Global .next() took [{time.time() - sg:.010f}]")
 
         # Iterate through every position module
         for modifier in path:

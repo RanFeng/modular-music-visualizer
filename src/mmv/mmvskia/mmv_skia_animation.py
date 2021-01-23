@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 from mmv.mmvskia.mmv_skia_generator import *
 from mmv.mmvskia.mmv_skia_modifiers import *
 import logging
@@ -40,15 +40,15 @@ import os
 class MMVSkiaAnimation:
 
     # Initialize a MMVSkiaAnimation class with required arguments
-    def __init__(self, mmv_skia_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmv_skia_main) -> None:
         debug_prefix = "[MMVSkiaAnimation.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         self.mmv_skia_main = mmv_skia_main
         self.preludec = self.mmv_skia_main.prelude["mmvanimation"]
 
         # Log we started
         if self.preludec["log_creation"]:
-            logging.info(f"{depth}{debug_prefix} Creating empty content and generators dictionary and list respectively")
+            logging.info(f"{debug_prefix} Creating empty content and generators dictionary and list respectively")
 
         # Content are the MMV objects stored that gets rendered on the screen
         # generators are MMVSkiaGenerators that we get new objects from
@@ -56,13 +56,12 @@ class MMVSkiaAnimation:
         self.generators = []
 
     # Make layers until a given N value
-    def mklayers_until(self, n: int, depth = LOG_NO_DEPTH) -> None:
+    def mklayers_until(self, n: int) -> None:
         debug_prefix = "[MMVSkiaAnimation.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Hard debug this action
         if self.preludec["mklayers_until"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} Making animation layers until N = [{n}]")
+            logging.debug(f"{debug_prefix} Making animation layers until N = [{n}]")
 
         # n + 1 because range() is exclusive at the end ( range(2) = [0, 1] )
         # and we use "human numbers" starting at 1
@@ -73,16 +72,15 @@ class MMVSkiaAnimation:
 
                 # Log that we'll be doing so
                 if self.preludec["mklayers_until"]["log_new_layers"]:
-                    logging.info(f"{depth}{debug_prefix} Animation layer index N = [{layer_index}] didn't existed, creating empty list")
+                    logging.info(f"{debug_prefix} Animation layer index N = [{layer_index}] didn't existed, creating empty list")
 
                 # Create empty list at
                 self.content[layer_index] = []
 
     # Call every next step of the content animations
-    def next(self, depth = LOG_NO_DEPTH) -> None:
+    def next(self) -> None:
         debug_prefix = "[MMVSkiaAnimation.next]"
-        ndepth = depth + LOG_NEXT_DEPTH
-        
+
         # Iterate through the generators
         for item in self.generators:
 

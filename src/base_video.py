@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -28,20 +28,11 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 # # # End user utilities, you can ignore this code
 
-from modules.end_user_utilities import Requirements, ArgParser
+from modules.end_user_utilities import ArgParser
 import sys
 
 # Parse shell arguments
 args = ArgParser(sys.argv)
-
-# We'll automatically install dependencies if we need and user flags so
-# Send --auto-deps flag while running this file
-if args.auto_deps:
-    requirements = Requirements()
-
-    # If we're running from source we have to run it
-    if requirements.need_to_run:
-        requirements.install()
 
 # # # MMV
 
@@ -144,7 +135,7 @@ interface.check_download_externals(target_externals = ["ffmpeg"])
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# We have two main modes "music" and "piano_roll", you can uncomment them
+# We have two main modes "music" and "piano", you can uncomment them
 
 # Default mode
 MODE = "music"
@@ -152,11 +143,21 @@ MODE = "music"
 # Pass a flag mode=music or mode=piano when calling this script
 # if that flag exists, then it overrides that previous MODE
 if "mode" in args.kflags:
-    if args.kflags["mode"] == "piano":
-        MODE = "piano_roll"
+    MODE = args.kflags["mode"]
 
-    elif args.kflags["mode"] == "music":
-        MODE = "music"
+# Want to test a preset how it looks before rendering to a file? set this to "realtime"
+# so we output the generated images to FFplay instead of FFmpeg or add the alone flag 
+# realtime when executing this script: [python base_video.py mode=piano realtime] for example
+# This by far probably won't be realtime at all unless you set an target framerate to something
+# like 24 fps and at a lower resolution (720p). Python is kinda slow for this task of keeping up
+# with the job, and also the audio processing doesn't help much since it's about realtime
+# only (70fps~ ish at target 60fps). This is mostly experimental.
+
+VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "video"
+# VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "realtime"
+
+if "realtime" in args.flags:
+    VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "realtime"
 
 
 # Configure your modes files
@@ -233,7 +234,7 @@ if MODE == "music":
     VISUALIZER_BARS_COLOR_PRESET = "colorful"  # Available: ["colorful", "white"]
 
 # Piano Roll general configuration
-elif MODE == "piano_roll":
+elif MODE == "piano":
 
     INPUT_MIDI  = THIS_FILE_DIR + "/assets/free_assets/piano_roll/contingency_times.mid"
 
@@ -241,8 +242,8 @@ elif MODE == "piano_roll":
     #   auto: Downloads and uses musescore for converting midi -> audio
     #   manutal: You configure the final audio of the video
 
-    # AUDIO_OF_MIDI = "auto"
     AUDIO_OF_MIDI = "auto"
+    # AUDIO_OF_MIDI = "manual"
 
     # Invalid setting assertion
     if not AUDIO_OF_MIDI in ["manual", "auto"]:
@@ -293,7 +294,7 @@ elif MODE == "piano_roll":
         PIANO_ROLL_MIDI_BPM = 120
 
     elif AUDIO_OF_MIDI == "manual":
-        PIANO_ROLL_MIDI_BPM = 130
+        PIANO_ROLL_MIDI_BPM = 120
 
 
 # # Quick enable and disable features used in both music and piano roll mode
@@ -302,7 +303,7 @@ elif MODE == "piano_roll":
 PROGRESSION_BAR = True
 
 # # Depends on mode
-if MODE == "piano_roll":
+if MODE == "piano":
     PROGRESSION_BAR_POSITION = "top"
     PARTICLES = False  # Particles don't go along pretty well with the piano roll (yet?)
     VIGNETTING = False  # I like vignetting on the piano roll but it hurts a bit the visibility
@@ -321,18 +322,6 @@ PARTICLES_PRESET:
 """
 PARTICLES_PRESET = "middle_out"
 # PARTICLES_PRESET = "bottom_mid_top"
-
-
-# Want to test a preset how it looks before rendering to a file? set this to "realtime"
-# so we output the generated images to FFplay instead of FFmpeg. This by far probably
-# won't be realtime at all unless you set an target framerate to something like 24 fps
-# and at a lower resolution (720p). Python is kinda slow for this task of keeping up
-# with the job, and also the audio processing doesn't help much since it's about realtime
-# only (70fps~ ish at target 60fps). This is mostly experimental.
-
-# VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "video"
-VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE = "realtime"
-
 
 if VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "video":
 
@@ -406,6 +395,7 @@ if VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "video":
         # "fastdecode": For low compute power devices to have less trouble with
         tune = "film",
 
+        vflip = False,
         vcodec = "libx264",
         override = True,
     )
@@ -509,7 +499,7 @@ mmv_skia_interface.input_audio(INPUT_AUDIO)
 if VIEW_REALTIME_OR_RENDER_TO_VIDEO_FILE == "video":
     mmv_skia_interface.output_video(OUTPUT_VIDEO)
 
-if (MODE == "piano_roll"):
+if (MODE == "piano"):
     mmv_skia_interface.input_midi(INPUT_MIDI)
 
 # # # Background
@@ -556,7 +546,7 @@ if (MODE == "music") and (BACKGROUND_TYPE == "image"):
     )
 
     # Add the backround object to be generated
-    # The layers are a ascending order of blitted items, 0 is first, 1 is after zero
+    # The layers are a ascending order of blited items, 0 is first, 1 is after zero
     # So our background is before everything, layer 0
     mmv_skia_interface.add(background, layer=0)
 
@@ -610,11 +600,71 @@ elif (MODE == "music"):
 
 # Piano roll
 
-if (MODE == "piano_roll"):
+if (MODE == "piano"):
+
+    # TODO: split file, colors customization
+    import seaborn as sns
+
+    background_palette = sns.color_palette("mako", 20)
+    background_palette_dark = [[c / 4 for c in rgb] for rgb in background_palette]
+
+    notes_palette = sns.color_palette("crest")
+
+    import random
+    random.seed(7)
+
+    colors = {
+        "sharp_key_idle_1":    [47, 45, 33, 255],
+        "sharp_key_idle_2":    [45, 45, 45, 255],
+        "sharp_key_pressed_1": [26, 26, 26, 255],
+        "sharp_key_pressed_2": [42, 38, 10, 255],
+        "sharp_key_3d_effect": [30, 30, 30, 255],
+
+        "plain_key_idle_1":    [255, 255, 255, 255],
+        "plain_key_idle_2":    [255, 250, 211, 255],
+        "plain_key_pressed_1": [140, 140, 140, 255],
+        "plain_key_pressed_2": [114, 114, 114, 255],
+        "plain_key_3d_effect": [187, 187, 187, 255],
+
+        "marker_color_sharp_keys": [255, 255, 255, 30],
+        "marker_color_between_two_white": [255, 255, 255, 20],
+
+        "end_piano_shadow": [40, 40, 40, 255],
+
+        "background_1": random.choice(background_palette_dark),
+        "background_2": random.choice(background_palette_dark),
+
+        "channel_0": {
+            "plain_1": random.choice(notes_palette),
+            "sharp_1": random.choice(notes_palette),
+            "border_shadow": [0, 0, 0, 255]
+        },
+
+        "channel_1": {
+            "plain_1": random.choice(notes_palette),
+            "sharp_1": random.choice(notes_palette),
+            "border_shadow": [0, 0, 0, 255]
+        },
+
+        "channel_2": {
+            "plain_1": random.choice(notes_palette),
+            "sharp_1": random.choice(notes_palette),
+            "border_shadow": [0, 0, 0, 255]
+        },
+
+        "channel_3": {
+            "plain_1": random.choice(notes_palette),
+            "sharp_1": random.choice(notes_palette),
+            "border_shadow": [0, 0, 0, 255]
+        },
+    }
+
     piano_roll = mmv_skia_interface.image_object()
     piano_roll.configure.add_module_piano_roll(
         seconds_of_midi_content = PIANO_ROLL_SECONDS_OF_MIDI_CONTENT_ON_SCREEN,
         bpm = PIANO_ROLL_MIDI_BPM,
+        colors = colors,
+        bleed = 10,
     )
     mmv_skia_interface.add(piano_roll, layer=1)
 
@@ -791,7 +841,7 @@ if PROGRESSION_BAR:
 
     if MODE == "music":
         shake_scalar = 14
-    elif MODE == "piano_roll":
+    elif MODE == "piano":
         shake_scalar = 0
         
     prog_bar.configure.add_module_progression_bar(

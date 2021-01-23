@@ -24,44 +24,40 @@
 - **Everything configurable.**
 
 <hr>
-Officially works on Linux with all features, most work on macOS and some on Windows
+Officially works on Linux with all features, most work on macOS and Windows
 <hr>
 
 ## Showcase
 
 ![Demo image of MMV](repo/music-mode.jpg)
+![Demo image of MMV](repo/music-mode-2.jpg)
 
-This screenshot is from a track of mine I released using MMV!!
-
-_The DAW is Ardour 6.0_
-
-[Link on YouTube](https://www.youtube.com/watch?v=KRI9cKPsK1Q) (Music Bars)
+[Link on YouTube](https://www.youtube.com/watch?v=5cUhRTab4Ks) (Music Bars Mode)
 
 <hr>
 
-![Demo image of MMV Piano Roll](repo/piano-roll.jpg)
+![Demo image of MMV Piano Roll](repo/piano-roll-2.jpg)
+![Demo image of MMV Piano Roll](repo/piano-roll-3.jpg)
 
-[Link on YouTube](https://youtu.be/CoFoRsoerjk) (Piano Roll)
-
-This screenshot is the piano tutorial of the previous music track!
+[Link on YouTube](https://www.youtube.com/watch?v=NwP5LESrceY) (Piano Roll Mode)
 
 <hr>
 
 # Idea
 
-I am a Free and Open Source music producer and code hobbyist and at some point it's inevitable I'd be releasing my tracks to the internet and create some project to make the music industry less harsh and more accessible.
+I am a Free and Open Source music producer and code hobbyist, at some point I'd be releasing my tracks to the internet and create some project to make the music industry less harsh and more accessible, that was once my thought.
 
-The problem is, I don't want to release a music video on a platform with a static image or just recording the screen, nor pay for *some software* to generate an "music visualization" for me without much control of it, taking out all the fun on hacking the non open source code.
+The problem is, I don't want to release a music video on a platform with a static image or just recording the screen, nor pay for some software to generate an "music visualization" for me without "much control" of it, taking out all the fun on hacking the non open source code.
 
-So I searched up for a free **(as in freedom and price)** tool that does exactly that, they do exist but aren't as good as they could be, most of the time a bit basic.
+So I searched up for a free **(as in freedom and price)** tool that does exactly that, they do exist but aren't as good as they could be, most of the time a bit basic or random looking.
 
-I embraced this opportunity on making a suckless music visualization tool (a more traditional approach than 3D random nonsense) with the programming languages and tools I love and care.
+I embraced this opportunity on making a suckless music visualization tool with the programming languages and tools I love and care.
 
 I cannot deny I took some heavy inspiration on 3blue1brown's [Manim](https://github.com/3b1b/manim) project, specifically the way we configure the MObjects there and simply add attributes, ask them to be drawn. While both are very different projects their usability are somewhat similar in a core level of how to operate.
 
 I also invite you to read about the [Free Software Definition / Philosophy](https://www.gnu.org/philosophy/free-sw.html) and join us on this amazing community!! :)
 
-*Let's make music more accessible for small producers and keep it affordable for such tallented people, I'm doing my part, are you doing yours?*
+*Let's make music more accessible for small producers and keep it affordable for such talented people, are you doing your part?*
 
 <hr>
 
@@ -149,7 +145,7 @@ I give you a few "free assets" files, those, apart from the MMV logo I created m
 
 # Acknowledgements, Thanks to
 
-I want to show my grattitude to these projects, no joke, MMV wouldn't be possible if these projects didn't exist.
+I want to show my gratitude to these projects, no joke, MMV wouldn't be possible if these projects didn't exist.
 
 Those are not in order of importance at all, they are always used together.
 
@@ -167,6 +163,8 @@ I'll mainly list the main name and where to find more info, it's just impossible
   
   - Generates the base videos and piano roll mode graphics.
 
+- [ModernGL Python package](https://github.com/moderngl/moderngl) for making it simple to render fragment shaders at insane speeds under Python, also the main dev for helping me with good practices and how to do stuff.
+  
 - [FFmpeg, FFplay](https://ffmpeg.org), _"A complete, cross-platform solution to record, convert and stream audio and video."_ - and they are not lying!!
 
   - "The Only One". Transforms images into videos, adds sound, filters.
@@ -174,12 +172,6 @@ I'll mainly list the main name and where to find more info, it's just impossible
 - The [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) language, OpenGL, Vulkan (on mpv flag), the [Khronos group](https://www.khronos.org) on its entirety, seriously, you guys are awesome!!
 
   - Also the [Python wrapper](https://pypi.org/project/glfw/) for the [GLFW](https://www.glfw.org/) library for setting up an GL canvas so Skia can draw on.
-
-- The [Shady](https://github.com/polyfloyd/shady) project by [polyfloyd](https://github.com/polyfloyd/), for rendering or displaying Shadertoy-like syntax GLSL scripts.
-  
-  - Currently used experimentally for generating video out of shaders (stupidly bigger potential given enough knowledge on shaders for the MMV project) 
-  
-  - I'd assume [Golang](https://golang.org/) as well for making Shady possible.
 
 ### Python packages and others involved
 

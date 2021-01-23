@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -41,9 +41,6 @@ class MMVSkiaPianoRollVectorial:
 
         For MMVSkiaPianoRollTopDown:
             {
-                "color_preset": string, "default"
-                    Colors preset filename under this file directory, subdirectory colors
-                    Don't send with ".yaml", it auto adds it
                 "do_draw_markers": bool, True
                     Draw orientation markers, lines in between keys?
                 "bleed": int, 3
@@ -75,7 +72,7 @@ class MMVSkiaPianoRollVectorial:
 
         # MMVSkiaPianoRollTopDown
         if self.config["type"] == "top-down":
-            self.config["color_preset"] = kwargs.get("color_preset", "default")
+            self.config["colors"] = kwargs["colors"]
             self.config["do_draw_markers"] = kwargs.get("do_draw_markers", True)
             self.config["bleed"] = kwargs.get("bleed", 3)
             self.config["seconds_of_midi_content"] = kwargs.get("seconds_of_midi_content", 3)

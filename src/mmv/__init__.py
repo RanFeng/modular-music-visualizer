@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, PACKAGE_DEPTH, LOG_NO_DEPTH, LOG_SEPARATOR, STEP_SEPARATOR
+from mmv.common.cmn_constants import STEP_SEPARATOR
 from mmv.common.cmn_download import Download
 from mmv.common.cmn_utils import Utils
 import subprocess
@@ -49,16 +49,16 @@ import os
 class MMVPackageInterface:
 
     # Hello world!
-    def greeter_message(self, depth = PACKAGE_DEPTH) -> None:
+    def greeter_message(self) -> None:
         debug_prefix = "[MMVPackageInterface.greeter_message]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
 
         self.terminal_width = shutil.get_terminal_size()[0]
 
         bias = " "*(math.floor(self.terminal_width/2) - 14)
 
         message = \
-f"""{depth}{debug_prefix} Show greeter message\n{"-"*self.terminal_width}
+f"""{debug_prefix} Show greeter message\n{"-"*self.terminal_width}
 {bias} __  __   __  __  __     __
 {bias}|  \\/  | |  \\/  | \\ \\   / /
 {bias}| |\\/| | | |\\/| |  \\ \\ / / 
@@ -71,9 +71,9 @@ f"""{depth}{debug_prefix} Show greeter message\n{"-"*self.terminal_width}
 """
         logging.info(message)
 
-    def thanks_message(self, depth = PACKAGE_DEPTH):
+    def thanks_message(self):
         debug_prefix = "[MMVPackageInterface.thanks_message]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
 
         # # Print thanks message :)
 
@@ -81,7 +81,7 @@ f"""{depth}{debug_prefix} Show greeter message\n{"-"*self.terminal_width}
 
         bias = " "*(math.floor(self.terminal_width/2) - 45)
         message = \
-f"""{depth}{debug_prefix} Show thanks message
+f"""{debug_prefix} Show thanks message
 \n{"-"*self.terminal_width}\n
 {bias}[+-------------------------------------------------------------------------------------------+]
 {bias} |                                                                                           |
@@ -111,55 +111,45 @@ f"""{depth}{debug_prefix} Show thanks message
     # MMVSkia works with glfw plus Skia to draw on a GL canvas and pipe
     # through FFmpeg to render a final video. Have Piano Roll options
     # and modules as well!!
-    def get_skia_interface(self, depth = PACKAGE_DEPTH, **kwargs):
+    def get_skia_interface(self, **kwargs):
         debug_prefix = "[MMVPackageInterface.get_skia_interface]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         from mmv.mmvskia import MMVSkiaInterface
 
-        logging.info(f"{depth}{debug_prefix} Get and return MMVSkiaInterface, kwargs: {kwargs}")
+        logging.info(f"{debug_prefix} Get and return MMVSkiaInterface, kwargs: {kwargs}")
         
-        return MMVSkiaInterface(top_level_interace = self, depth = ndepth, **kwargs)
+        return MMVSkiaInterface(top_level_interace = self, **kwargs)
     
     # MMVShader works with GLSL shaders through MPV. Currently most
     # applicable concept is post processing which bumps MMV quality
     # by a lot
-    def get_shader_interface(self, depth = PACKAGE_DEPTH):
+    def get_shader_interface(self):
         debug_prefix = "[MMVPackageInterface.get_shader_interface]"
-        ndepth = depth + LOG_NEXT_DEPTH
         from mmv.mmvshader import MMVShaderInterface
-
-        logging.info(f"{depth}{debug_prefix} Return MMVShaderInterface")
-        
-        return MMVShaderInterface(top_level_interace = self, depth = ndepth)
+        logging.info(f"{debug_prefix} Return MMVShaderInterface")
+        return MMVShaderInterface(top_level_interace = self)
 
     # Return one (usually required) setting up encoder
-    def get_ffmpeg_wrapper(self, depth = PACKAGE_DEPTH):
+    def get_ffmpeg_wrapper(self):
         debug_prefix = "[MMVPackageInterface.get_ffmpeg_wrapper]"
-        ndepth = depth + LOG_NEXT_DEPTH
         from mmv.common.wrappers.wrap_ffmpeg import FFmpegWrapper
-
-        logging.info(f"{depth}{debug_prefix} Return FFmpegWrapper")
-        
+        logging.info(f"{debug_prefix} Return FFmpegWrapper")
         return FFmpegWrapper()
     
     # Return FFplay wrapper, rarely needed but just in case
-    def get_ffplay_wrapper(self, depth = PACKAGE_DEPTH):
+    def get_ffplay_wrapper(self):
         debug_prefix = "[MMVPackageInterface.get_ffplay_wrapper]"
-        ndepth = depth + LOG_NEXT_DEPTH
         from mmv.common.wrappers.wrap_ffplay import FFplayWrapper
-
-        logging.info(f"{depth}{debug_prefix} Return FFplayWrapper")
-        
+        logging.info(f"{debug_prefix} Return FFplayWrapper")
         return FFplayWrapper()
 
     # Main interface class, mainly sets up root dirs, get config, distributes classes
     # Send platform = "windows", "macos", "linux" for forcing a specific one
-    def __init__(self, platform = None, depth = PACKAGE_DEPTH, **kwargs) -> None:
+    def __init__(self, platform = None, **kwargs) -> None:
         debug_prefix = "[MMVPackageInterface.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Versioning
-        self.version = "2.5.1-optimize"
+        self.version = "2.6-revamp"
 
         # Can only run on Python 64 bits, this expression returns 32 if 32 bit installation
         # and 64 if 64 bit installation, we assert that (assume it's true, quit if it isn't)
@@ -179,27 +169,27 @@ f"""{depth}{debug_prefix} Show thanks message
         # This deals with the case we used pyinstaller and it'll get the executable path instead
         if getattr(sys, 'frozen', True):    
             self.MMV_PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
-            print(f"{depth}{debug_prefix} Running directly from source code")
-            print(f"{depth}{debug_prefix} Modular Music Visualizer Python package [__init__.py] located at [{self.MMV_PACKAGE_ROOT}]")
+            print(f"{debug_prefix} Running directly from source code")
+            print(f"{debug_prefix} Modular Music Visualizer Python package [__init__.py] located at [{self.MMV_PACKAGE_ROOT}]")
         else:
             self.MMV_PACKAGE_ROOT = os.path.dirname(os.path.abspath(sys.executable))
-            print(f"{depth}{debug_prefix} Running from release (sys.executable..?)")
-            print(f"{depth}{debug_prefix} Modular Music Visualizer executable located at [{self.MMV_PACKAGE_ROOT}]")
+            print(f"{debug_prefix} Running from release (sys.executable..?)")
+            print(f"{debug_prefix} Modular Music Visualizer executable located at [{self.MMV_PACKAGE_ROOT}]")
 
         # # Load prelude configuration
 
-        print(f"{depth}{debug_prefix} Loading prelude configuration file")
+        print(f"{debug_prefix} Loading prelude configuration file")
         
         # Build the path the prelude file should be located at
         prelude_file = f"{self.MMV_PACKAGE_ROOT}{sep}prelude.toml"
 
-        print(f"{depth}{debug_prefix} Attempting to load prelude file located at [{prelude_file}], we cannot continue if this is wrong..")
+        print(f"{debug_prefix} Attempting to load prelude file located at [{prelude_file}], we cannot continue if this is wrong..")
 
         # Load the prelude file
         with open(prelude_file, "r") as f:
             self.prelude = toml.loads(f.read())
         
-        print(f"{depth}{debug_prefix} Loaded prelude configuration file, data: [{self.prelude}]")
+        print(f"{debug_prefix} Loaded prelude configuration file, data: [{self.prelude}]")
 
         # # # Logging 
 
@@ -207,7 +197,7 @@ f"""{depth}{debug_prefix} Show thanks message
 
         # # Reset current handlers if any
         
-        print(f"{depth}{debug_prefix} Resetting Python's logging logger handlers to empty list")
+        print(f"{debug_prefix} Resetting Python's logging logger handlers to empty list")
 
         # Get logger and empty the list
         logger = logging.getLogger()
@@ -235,11 +225,11 @@ f"""{depth}{debug_prefix} Show thanks message
 
             # Reset the log file
             with open(self.LOG_FILE, "w") as f:
-                print(f"{depth}{debug_prefix} Reset log file located at [{self.LOG_FILE}]")
+                print(f"{debug_prefix} Reset log file located at [{self.LOG_FILE}]")
                 f.write("")
 
             # Verbose and append the file handler
-            print(f"{depth}{debug_prefix} Reset log file located at [{self.LOG_FILE}]")
+            print(f"{debug_prefix} Reset log file located at [{self.LOG_FILE}]")
             handlers.append(logging.FileHandler(filename = self.LOG_FILE, encoding = 'utf-8'))
 
         # .. otherwise just keep the StreamHandler to stdout
@@ -267,11 +257,11 @@ f"""{depth}{debug_prefix} Show thanks message
         print("-" * self.terminal_width + "\n")
 
         # Log what we'll do next
-        logging.info(f"{depth}{debug_prefix} We're done with the pre configuration of Python's behavior and loading prelude.toml configuration file")
+        logging.info(f"{debug_prefix} We're done with the pre configuration of Python's behavior and loading prelude.toml configuration file")
 
         # Log precise Python version
         sysversion = sys.version.replace("\n", " ").replace("  ", " ")
-        logging.info(f"{depth}{debug_prefix} Running on Python: [{sysversion}]")
+        logging.info(f"{debug_prefix} Running on Python: [{sysversion}]")
 
         # # # FIXME: Python 3.9, go home you're drunk
 
@@ -280,19 +270,19 @@ f"""{depth}{debug_prefix} Show thanks message
         pversion = sys.version_info
 
         # Log and check
-        logging.info(f"{depth}{debug_prefix} Checking if Python <= {maximum_working_python_version} for a working version.. ")
+        logging.info(f"{debug_prefix} Checking if Python <= {maximum_working_python_version} for a working version.. ")
 
         # Huh we're on Python 2..?
         if pversion[0] == 2:
-            logging.error(f"{depth}{debug_prefix} Please upgrade to at least Python 3")
+            logging.error(f"{debug_prefix} Please upgrade to at least Python 3")
             sys.exit(-1)
         
         # Python is ok
         if (pversion[0] <= maximum_working_python_version[0]) and (pversion[1] <= maximum_working_python_version[1]):
-            logging.info(f"{depth}{debug_prefix} Ok, good python version")
+            logging.info(f"{debug_prefix} Ok, good python version")
         else:
             # Warn Python 3.9 is a bit unstable, even the developer had issues making it work
-            logging.warn(f"{depth}{debug_prefix} Python 3.9 is acting a bit weird regarding some dependencies on some systems, while it should be possible to run, take it with some grain of salt and report back into the discussions troubles or workarounds you found?")
+            logging.warn(f"{debug_prefix} Python 3.9 is acting a bit weird regarding some dependencies on some systems, while it should be possible to run, take it with some grain of salt and report back into the discussions troubles or workarounds you found?")
             input("\n [ Press enter to continue.. ]: ")
 
         # # The operating system we're on, one of "linux", "windows", "macos"
@@ -305,51 +295,51 @@ f"""{depth}{debug_prefix} Show thanks message
                 "darwin": "macos"
             }.get(os.name)
         else:
-            logging.info(f"{depth}{debug_prefix} Overriding platform OS to = [{platform}]")
+            logging.info(f"{debug_prefix} Overriding platform OS to = [{platform}]")
             self.os = platform
 
         # Log which OS we're running
-        logging.info(f"{depth}{debug_prefix} Running Modular Music Visualizer on Operating System: [{self.os}]")
-        logging.info(f"{depth}{debug_prefix} (os.path.sep) is [{sep}]")
+        logging.info(f"{debug_prefix} Running Modular Music Visualizer on Operating System: [{self.os}]")
+        logging.info(f"{debug_prefix} (os.path.sep) is [{sep}]")
 
         # # Create interface's classes
 
-        logging.info(f"{depth}{debug_prefix} Creating Utils() class")
+        logging.info(f"{debug_prefix} Creating Utils() class")
         self.utils = Utils()
 
-        logging.info(f"{depth}{debug_prefix} Creating Download() class")
+        logging.info(f"{debug_prefix} Creating Download() class")
         self.download = Download()
 
         # # Common directories between packages
 
         # Externals
         self.externals_dir = f"{self.MMV_PACKAGE_ROOT}{sep}externals"
-        logging.info(f"{depth}{debug_prefix} Externals dir is [{self.externals_dir}]")
-        self.utils.mkdir_dne(path = self.externals_dir, depth = ndepth)
+        logging.info(f"{debug_prefix} Externals dir is [{self.externals_dir}]")
+        self.utils.mkdir_dne(path = self.externals_dir, silent = True)
 
         # Downloads (inside externals)
         self.downloads_dir = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}downloads"
-        logging.info(f"{depth}{debug_prefix} Downloads dir is [{self.downloads_dir}]")
-        self.utils.mkdir_dne(path = self.downloads_dir, depth = ndepth)
+        logging.info(f"{debug_prefix} Downloads dir is [{self.downloads_dir}]")
+        self.utils.mkdir_dne(path = self.downloads_dir, silent = True)
 
         # Data dir
         self.data_dir = f"{self.MMV_PACKAGE_ROOT}{sep}data"
-        logging.info(f"{depth}{debug_prefix} Data dir is [{self.data_dir}]")
-        self.utils.mkdir_dne(path = self.data_dir, depth = ndepth)
+        logging.info(f"{debug_prefix} Data dir is [{self.data_dir}]")
+        self.utils.mkdir_dne(path = self.data_dir, silent = True)
 
         # Windoe juuuust in case
         if self.os == "windows":
-            logging.info(f"{depth}{debug_prefix} Appending the Externals directory to system path juuuust in case...")
+            logging.info(f"{debug_prefix} Appending the Externals directory to system path juuuust in case...")
             sys.path.append(self.externals_dir)
 
         # # Common files
 
         self.last_session_info_file = f"{self.data_dir}{sep}last_session_info.toml"
-        logging.info(f"{depth}{debug_prefix} Last session info file is [{self.last_session_info_file}], resetting it..")
+        logging.info(f"{debug_prefix} Last session info file is [{self.last_session_info_file}], resetting it..")
 
         # Code flow management
         if self.prelude["flow"]["stop_at_initialization"]:
-            logging.critical(f"{depth}{debug_prefix} Exiting as stop_at_initialization key on prelude.toml is True")
+            logging.critical(f"{debug_prefix} Exiting as stop_at_initialization key on prelude.toml is True")
             sys.exit(0)
         
         # # External dependencies where to append for PATH
@@ -357,17 +347,17 @@ f"""{depth}{debug_prefix} Show thanks message
         # Externals directory for Linux
         self.externals_dir_linux = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}linux"
         logging.info(f"{debug_prefix} Externals directory for Linux OS is [{self.externals_dir_linux}]")
-        self.utils.mkdir_dne(path = self.externals_dir_linux)
+        self.utils.mkdir_dne(path = self.externals_dir_linux, silent = True)
 
         # Externals directory for Windows
         self.externals_dir_windows = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}windows"
         logging.info(f"{debug_prefix} Externals directory for Windows OS is [{self.externals_dir_windows}]")
-        self.utils.mkdir_dne(path = self.externals_dir_windows)
+        self.utils.mkdir_dne(path = self.externals_dir_windows, silent = True)
 
         # Externals directory for macOS
         self.externals_dir_macos = f"{self.MMV_PACKAGE_ROOT}{sep}externals{sep}macos"
         logging.info(f"{debug_prefix} Externals directory for Darwin OS (macOS) is [{self.externals_dir_macos}]")
-        self.utils.mkdir_dne(path = self.externals_dir_macos)
+        self.utils.mkdir_dne(path = self.externals_dir_macos, silent = True)
 
         # # This native platform externals dir
         self.externals_dir_this_platform = self.__get_platform_external_dir(self.os)
@@ -398,9 +388,9 @@ f"""{depth}{debug_prefix} Show thanks message
         return externals_dir
 
     # Update the self.EXTERNALS_SEARCH_PATH to every recursive subdirectory on the platform's externals dir
-    def update_externals_search_path(self, depth = PACKAGE_DEPTH):
+    def update_externals_search_path(self):
         debug_prefix = "[MMVPackageInterface.update_externals_search_path]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
 
         # The subdirectories on this platform externals folder
         externals_subdirs = self.utils.get_recursively_all_subdirectories(self.externals_dir_this_platform)
@@ -413,30 +403,20 @@ f"""{depth}{debug_prefix} Show thanks message
         # If we do have subdirectories on this platform externals then append to it
         if externals_subdirs:
             self.EXTERNALS_SEARCH_PATH += externals_subdirs
-        
-        # Golang
-        GOPATH = os.environ.get("GOPATH", None)
-
-        if GOPATH is None:
-            logging.warn(f"{depth}{debug_prefix} Couldn't find GOPATH, do you have Golang installed? Required for MMVShaderShady")
-        else:
-            GOPATH = f"{GOPATH}{os.path.sep}bin"
-            logging.info(f"{depth}{debug_prefix} Appending GOPATH bin dir [{GOPATH}]")
-            self.EXTERNALS_SEARCH_PATH.append(GOPATH)
 
     # Search for something in system's PATH, also searches for the externals folder
     # Don't append the extra .exe because Linux, macOS doesn't have these, returns False if no binary was found
-    def find_binary(self, binary, depth = PACKAGE_DEPTH):
+    def find_binary(self, binary):
         debug_prefix = "[MMVPackageInterface.find_binary]"
-        ndepth = depth + LOG_NEXT_DEPTH
-        logging.info(LOG_SEPARATOR)
+
+        logging.info(STEP_SEPARATOR)
 
         # Append .exe for Windows
         if self.os == "windows":
             binary += ".exe"
 
         # Log action
-        logging.info(f"{depth}{debug_prefix} Finding binary in PATH and EXTERNALS directories: [{binary}]")
+        logging.info(f"{debug_prefix} Finding binary in PATH and EXTERNALS directories: [{binary}]")
 
         return self.utils.get_executable_with_name(binary, extra_paths = self.EXTERNALS_SEARCH_PATH)
 
@@ -448,9 +428,9 @@ f"""{depth}{debug_prefix} Show thanks message
     #
     # Possible values for target are: ["ffmpeg", "mpv", "musescore"]
     #
-    def check_download_externals(self, target_externals = [], platform = None, depth = PACKAGE_DEPTH):
+    def check_download_externals(self, target_externals = [], platform = None):
         debug_prefix = "[MMVPackageInterface.check_download_externals]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
 
         # Overwrite os if user set to a specific one
         if platform is None:
@@ -573,7 +553,7 @@ f"""{depth}{debug_prefix} Show thanks message
 
                     # Where to extract final mpv
                     mpv_extracted_folder = f"{self.externals_dir_this_platform}{sep}" + mpv_7z_version.replace(".7z", "")
-                    self.utils.mkdir_dne(path = mpv_extracted_folder, depth = ndepth)
+                    self.utils.mkdir_dne(path = mpv_extracted_folder)
 
                     # Extract the files
                     self.download.extract_file(mpv_7z, mpv_extracted_folder)
@@ -604,86 +584,6 @@ f"""{depth}{debug_prefix} Show thanks message
                     
                 else:  # Already have the binary
                     logging.info(f"{debug_prefix} Already have [musescore] binary in externals / system path!!")
-
-            # # Golang
-
-            if external == "golang":
-                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
-
-                # We're on Linux / macOS so checking ffmpeg external dependency on system's path
-                if platform in ["linux", "macos"]:
-                    self.__cant_micro_manage_external_for_you(binary = "go", help_fix = f"Go to [https://golang.org/dl/] and install for your platform, macOS and Linux are highly recommended to install from package manager / distro.")
-                    continue
-                
-                # If we don't have musescore binary on externals dir or system's path
-                if not self.find_binary("go"):
-
-                    golang_installer = "go1.15.6.windows-amd64.msi"
-                    save_golang_installer = f"{self.downloads_dir}{sep}{golang_installer}"
-
-                    # Download Golang installer
-                    self.download.wget(
-                        f"https://golang.org/dl/{golang_installer}",
-                        save_golang_installer, f"Golang installer [{golang_installer}]"
-                    )
-
-                    # Install Golang
-                    install_command = ["msiexec", "/i", save_golang_installer, "/qn"]
-                    logging.info(f"{debug_prefix} Running Golang install command quiet: {install_command}")
-                    subprocess.run(install_command)
-                    
-                else:  # Already have the binary
-                    logging.info(f"{debug_prefix} Already have [go] binary in externals / system path!!")
-
-            # Shady
-
-            if external in ["shady", "upgrade-shady"]:
-                debug_prefix = f"[MMVPackageInterface.check_download_externals({external})]"
-
-                # Ignore we just use to mark we want to go get -u anyways
-                if external == "upgrade-shady":
-                    continue
-
-                # Try finding the shady binary first
-                shady_bin = self.find_binary("shady")
-
-                if shady_bin:
-                    logging.info(f"{debug_prefix} Already have Shady binary, located at [{shady_bin}]")
-                    
-                    # Continue or not? continuing will go get -u, upgrade the shady binary
-                    if not "upgrade-shady" in target_externals:
-                        logging.info(f"{debug_prefix} Already have Shady but not upgrading it, send \"upgrade-shady\" target external to force this")
-                        continue
-                    logging.info(f"{debug_prefix} Continuing Shady reinstalation (will upgrade the binary)")
-
-                # Find the golang binary
-                go_bin = self.find_binary("go")
-
-                # If we don't have musescore binary on externals dir or system's path
-                if not go_bin:
-                    logging.info(f"{debug_prefix} You don't have [go] executable on system's PATH or externals, running check_download_externals(\"go\")?")
-                    self.check_download_externals(target_externals = "go", platform = platform)
-                
-                    # Find the golang binary (again)
-                    go_bin = self.find_binary("go")
-
-                # Log where is the go binary
-                logging.info(f"{debug_prefix} Golang binary is [{go_bin}]")
-
-                # Can we even have "go version" command to run?
-                command = [go_bin, "version"]
-                try:
-                    subprocess.check_output(command)
-                except Exception as e:
-                    logging.error(f"{debug_prefix} For some reason calling {command} failed, {e}")
-                    sys.exit(-1)
-                
-                # The command we'll download, upgrade shady
-                install_shady_command = [go_bin, "get", "-v", "-u", "github.com/polyfloyd/shady/cmd/shady"]
-
-                # Log command, run command
-                logging.info(f"{debug_prefix} Getting and installing polyfloyd's shady (GLSL shader file -> Video), command is {install_shady_command}")
-                subprocess.run(install_shady_command)
 
             # Update the externals search path because we downloaded stuff
             self.update_externals_search_path()

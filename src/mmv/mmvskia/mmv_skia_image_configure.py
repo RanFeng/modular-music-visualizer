@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -28,7 +28,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.mmvskia.mmv_skia_interpolation import MMVSkiaInterpolation
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 from mmv.mmvskia.mmv_skia_vectorial import MMVSkiaVectorial
 from mmv.mmvskia.mmv_skia_modifiers import *
 import logging
@@ -51,16 +51,15 @@ class MMVSkiaImageConfigure:
 
     # # # [ Load Image ] # # #
 
-    def load_image(self, path: str, depth = LOG_NO_DEPTH) -> None:
+    def load_image(self, path: str) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.load_image]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Get absolute and real path
-        path = self.mmvskia_main.utils.get_absolute_realpath(path, depth = ndepth, silent = not self.preludec["load_image"]["log_get_abspath"])
+        path = self.mmvskia_main.utils.get_absolute_realpath(path, silent = not self.preludec["load_image"]["log_get_abspath"])
 
         # Log action
         if self.preludec["load_image"]["log_action"]:
-            logging.info(f"{depth}{debug_prefix} [{self.identifier}] Loading image from path [{path}]")
+            logging.info(f"{debug_prefix} [{self.identifier}] Loading image from path [{path}]")
 
         # Fail safe get the abspath and 
         self.parent_object.image.load_from_path(
@@ -70,27 +69,23 @@ class MMVSkiaImageConfigure:
     # # # [ Dealing with animation ] # # #
 
     # Macros for initializing this animation layer
-    def init_animation_layer(self, depth = LOG_NO_DEPTH) -> None:
+    def init_animation_layer(self) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.init_animation_layer]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log info and run routine functions
         if self.preludec["init_animation_layer"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Initializing animation layer")
-
-        ndepth += LOG_NEXT_DEPTH
+            logging.debug(f"{debug_prefix} [{self.identifier}] Initializing animation layer")
 
         # Reset animation layer and set an infinite amount of steps
-        self.start_or_reset_this_animation(depth = ndepth)
-        self.set_this_animation_steps(steps = math.inf, depth = ndepth)
+        self.start_or_reset_this_animation()
+        self.set_this_animation_steps(steps = math.inf)
 
     # Make an empty animation layer according to this animation index, dictionaries, RESETS EVERYTHING
-    def start_or_reset_this_animation(self, depth = LOG_NO_DEPTH) -> None:
+    def start_or_reset_this_animation(self) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.start_or_reset_this_animation]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         if self.preludec["start_or_reset_this_animation"]["log_action"]:
-            logging.info(f"{depth}{debug_prefix} [{self.identifier}] Reset the parent MMVSkiaImage object animation layers")
+            logging.info(f"{debug_prefix} [{self.identifier}] Reset the parent MMVSkiaImage object animation layers")
 
         # Emptry layer of stuff
         self.parent_object.animation[self.animation_index] = {}
@@ -99,23 +94,21 @@ class MMVSkiaImageConfigure:
         self.parent_object.animation[self.animation_index]["animation"] = {}
 
     # Override current animation index we're working on into new index
-    def set_animation_index(self, n: int, depth = LOG_NO_DEPTH) -> None:
+    def set_animation_index(self, n: int) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.set_animation_index]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         if self.preludec["set_animation_index"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Set animation index N = [{n}]")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Set animation index N = [{n}]")
 
         self.animation_index = n
 
     # How much steps in this animation  
-    def set_this_animation_steps(self, steps: float, depth = LOG_NO_DEPTH) -> None:
+    def set_this_animation_steps(self, steps: float) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.set_this_animation_steps]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Hard debug
         if self.preludec["set_this_animation_steps"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] This animation N = [{self.animation_index}] will have [{steps}] steps")
+            logging.debug(f"{debug_prefix} [{self.identifier}] This animation N = [{self.animation_index}] will have [{steps}] steps")
 
         self.parent_object.animation[self.animation_index]["animation"]["steps"] = steps
 
@@ -127,13 +120,12 @@ class MMVSkiaImageConfigure:
 
     # Resize this Image (doesn't work with Video) to this resolution
     # kwargs: { "width": float, "height": float, "override": bool, False }
-    def resize_image_to_resolution(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def resize_image_to_resolution(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.resize_image_to_resolution]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["resize_image_to_resolution"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Resize image to resolution, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Resize image to resolution, kwargs: {kwargs}")
 
         self.parent_object.image.resize_to_resolution(
             width = kwargs["width"],
@@ -143,13 +135,12 @@ class MMVSkiaImageConfigure:
 
     # kwargs: { "over_resize_width": float, 0, "over_resize_height": float, 0, "override": bool, True}
     # Over resizes mainly because Shake modifier
-    def resize_image_to_video_resolution(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def resize_image_to_video_resolution(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.resize_image_to_video_resolution]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["resize_image_to_video_resolution"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Resize image to video, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Resize image to video, kwargs: {kwargs}")
 
         self.resize_image_to_resolution(
             width = self.parent_object.mmvskia_main.context.width + kwargs.get("over_resize_width", 0),
@@ -170,13 +161,12 @@ class MMVSkiaImageConfigure:
             Adds to the width and height to resize a bit more, a bleed
     }
     """
-    def add_module_video(self, depth = LOG_NO_DEPTH, **kwargs):
+    def add_module_video(self, **kwargs):
         debug_prefix = "[MMVSkiaImageConfigure.add_module_video]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_video"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add video module, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add video module, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["video"] = {
             "path": kwargs["path"],
@@ -192,13 +182,12 @@ class MMVSkiaImageConfigure:
         y: float, Y coordinate
     }
     """
-    def add_path_point(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def add_path_point(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_path_point]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_path_point"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add path point, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add path point, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["position"]["path"].append(
             MMVSkiaModifierPoint(
@@ -216,13 +205,12 @@ class MMVSkiaImageConfigure:
             Remaining approach ratio
     }
     """
-    def simple_add_path_modifier_shake(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def simple_add_path_modifier_shake(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.simple_add_path_modifier_shake]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["simple_add_path_modifier_shake"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add simple shaker modifier, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add simple shaker modifier, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["position"]["path"].append(
             MMVSkiaModifierShake(
@@ -246,13 +234,12 @@ class MMVSkiaImageConfigure:
     """     (MMVSkiaVectorial)
     Adds a MMVSkiaVectorial with configs on kwargs (piano roll, progression bar, music bars)
     """
-    def add_vectorial_by_kwargs(self, depth = LOG_NO_DEPTH, **kwargs):
+    def add_vectorial_by_kwargs(self, **kwargs):
         debug_prefix = "[MMVSkiaImageConfigure.add_vectorial_by_kwargs]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_vectorial_by_kwargs"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add vectorial module by kwargs, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add vectorial module by kwargs, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["vectorial"] = {
             "object": MMVSkiaVectorial(
@@ -265,33 +252,31 @@ class MMVSkiaImageConfigure:
         Add a music bars visualizer module
     kwargs: configuration, see MMVSkiaMusicBarsVectorial class on MMVSkiaVectorial
     """
-    def add_module_visualizer(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def add_module_visualizer(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_visualizer]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Talk to MMVSkiaVectorial, say this is a visualizer and add MMVSkiaVectorial
         kwargs["vectorial_type_class"] = "visualizer"
 
         # Log action
         if self.preludec["add_module_visualizer"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
 
-        self.add_vectorial_by_kwargs(depth = ndepth, **kwargs)
+        self.add_vectorial_by_kwargs(**kwargs)
         
     """     (MMVSkiaVectorial), Progression Bar
         Add a progression bar module
     kwargs: configuration, see MMVSkiaProgressionBarVectorial class on MMVSkiaVectorial
     """
-    def add_module_progression_bar(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def add_module_progression_bar(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_progression_bar]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Talk to MMVSkiaVectorial, say this is a progression bar and add MMVSkiaVectorial
         kwargs["vectorial_type_class"] = "progression-bar"
 
         # Log action
         if self.preludec["add_module_progression_bar"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
 
         self.add_vectorial_by_kwargs(**kwargs)
 
@@ -299,16 +284,15 @@ class MMVSkiaImageConfigure:
         Add a piano roll module
     kwargs: configuration, see MMVSkiaPianoRollVectorial on MMVSkiaVectorial
     """
-    def add_module_piano_roll(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def add_module_piano_roll(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_piano_roll]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Talk to MMVSkiaVectorial, say this is a piano roll and add MMVSkiaVectorial
         kwargs["vectorial_type_class"] = "piano-roll"
 
         # Log action
         if self.preludec["add_module_piano_roll"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Changed kwargs vectorial_type_class, new kwargs and call add_vectorial_by_kwargs: {kwargs}")
 
         self.add_vectorial_by_kwargs(**kwargs)
 
@@ -332,13 +316,12 @@ class MMVSkiaImageConfigure:
             4.5: high-plus
     }
     """
-    def add_module_resize(self, depth = LOG_NO_DEPTH, **kwargs)-> None:
+    def add_module_resize(self, **kwargs)-> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_resize]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_resize"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add module resize, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add module resize, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["resize"] = {
             "object": MMVSkiaModifierScalarResize(
@@ -364,13 +347,12 @@ class MMVSkiaImageConfigure:
             20: high
     }
     """
-    def add_module_blur(self, depth = LOG_NO_DEPTH, **kwargs)-> None:
+    def add_module_blur(self, **kwargs)-> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_blur]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_blur"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add module blur, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add module blur, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["blur"] = {
             "object": MMVSkiaModifierGaussianBlur(
@@ -397,13 +379,12 @@ class MMVSkiaImageConfigure:
         "phase": float, 0, start the sinewave with a certain phase in radians?
     }
     """
-    def add_module_swing_rotation(self, depth = LOG_NO_DEPTH, **kwargs)-> None:
+    def add_module_swing_rotation(self, **kwargs)-> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_swing_rotation]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_swing_rotation"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add module swing rotation, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add module swing rotation, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["rotate"] = {
             "object": MMVSkiaModifierSineSwing(self.mmvskia_main, **kwargs)
@@ -417,13 +398,12 @@ class MMVSkiaImageConfigure:
         "phase": float, 0, start the sinewave with a certain phase in radians?
     }
     """
-    def add_module_linear_rotation(self, depth = LOG_NO_DEPTH, **kwargs)-> None:
+    def add_module_linear_rotation(self, **kwargs)-> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_linear_rotation]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_linear_rotation"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add module linear rotation, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add module linear rotation, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["rotate"] = {
             "object": MMVSkiaModifierLinearSwing(self.mmvskia_main, **kwargs)
@@ -439,13 +419,12 @@ class MMVSkiaImageConfigure:
         "smooth": float, how smooth changing values are on the interpolation
     }
     """
-    def add_module_vignetting(self, depth = LOG_NO_DEPTH, **kwargs)-> None:
+    def add_module_vignetting(self, **kwargs)-> None:
         debug_prefix = "[MMVSkiaImageConfigure.add_module_vignetting]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["add_module_vignetting"]["log_action"]:
-            logging.debug(f"{ndepth}{debug_prefix} [{self.identifier}] Add module linear rotation, kwargs: {kwargs}")
+            logging.debug(f"{debug_prefix} [{self.identifier}] Add module linear rotation, kwargs: {kwargs}")
 
         self.parent_object.animation[self.animation_index]["modules"]["vignetting"] = {
             "object": MMVSkiaModifierVignetting(

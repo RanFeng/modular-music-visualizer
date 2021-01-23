@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 import mmv.common.cmn_any_logger
 from PIL import Image
 import numpy as np
@@ -65,11 +65,10 @@ class FFmpegWrapper:
         scale: str = None,  # Apply -vf scale=WxH, send like 1280:720 
         shortest: bool = True,
         profile_compat: str = "baseline",  # x264 profile to use, baseline or main, None to disable, sets -vf yuv420
-        depth = LOG_NO_DEPTH,
     ) -> None:
 
         debug_prefix = "[FFmpegWrapper.configure_encoding]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
 
         # Generate the command for piping images to
         self.command = [
@@ -106,7 +105,7 @@ class FFmpegWrapper:
 
             # Danger, we can overflow the buffer this way and get soft locked
             if not loglevel == "panic":
-                logging.info(f"{depth}{debug_prefix} You are piping a video and loglevel is not set to PANIC")
+                logging.info(f"{debug_prefix} You are piping a video and loglevel is not set to PANIC")
         else:
             self.command += ["-i", input_video_source]
         
@@ -157,13 +156,13 @@ class FFmpegWrapper:
             self.command.append("-y")
 
         # Log the command for generating final video
-        logging.info(f"{depth}{debug_prefix} FFmpeg command is: {self.command}")
+        logging.info(f"{debug_prefix} FFmpeg command is: {self.command}")
       
-    def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
+    def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE):
         debug_prefix = "[FFmpegWrapper.start]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
-        logging.info(f"{depth}{debug_prefix} Starting FFmpeg pipe subprocess with command {self.command}")
+
+        logging.info(f"{debug_prefix} Starting FFmpeg pipe subprocess with command {self.command}")
 
         # Create a subprocess in the background
         self.subprocess = subprocess.Popen(

@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -58,7 +58,7 @@ POST_PROCESS_TYPE = "last_render"
 
 # If set to False will play real time
 # Rendering to video is a Linux only feature, not available due MPV limitations on Windows and macOS
-RENDER_TO_VIDEO = False
+RENDER_TO_VIDEO = True
 OUTPUT_VIDEO_NAME = f"{THIS_DIR}{sep}post_process_output.mkv"
 
 
@@ -104,7 +104,7 @@ if POST_PROCESS_TYPE == "last_render":
     edge_low_saturation_shader = mpv_shader_maker.replaced_values_shader(
         input_shader_path = f"{mmv_shader_interface.MMV_SHADER_ROOT}/glsl/mpv/fx/r1_edge_saturation_low.glsl",
         changing_amount = [
-            max(2 - (value*5), 0.2) for value in activation_values
+            max( (1.2 - (value*10)), 0.15) for value in activation_values
         ],
     )  # This .replaced_values_shader returns the path of the replaced shader
     mpv.add_shader(edge_low_saturation_shader)

@@ -2,7 +2,7 @@
 #                                GPL v3 License                                
 # ===============================================================================
 #
-# Copyright (c) 2020,
+# Copyright (c) 2020 - 2021,
 #   - Tremeschin < https://tremeschin.gitlab.io > 
 #
 # ===============================================================================
@@ -26,109 +26,75 @@
 
 global:
   # Piano roll background
-  background: "161616"
+  background_1:  "#1c2a47"
+  background_2: "#1c4a40"
+
+  end_piano: "#303030" # Shadow
   
   # Visual markers
-  marker_color_sharp_keys: "525252"
-  marker_color_between_two_white: "727272"
+  marker_color_sharp_keys: "#525252"
+  marker_color_between_two_white: "#727272"
 
   # Sharp key state
-  sharp_key_idle: "333333"
-  sharp_key_pressed: "000000"
+  sharp_key_idle_1: "#33322c"
+  sharp_key_idle_2: "#333333"
+  sharp_key_pressed_1: "#302e25"
+  sharp_key_pressed_2: "#000000"
+  sharp_key_3d_effect: "#262626"
 
   # Plain key state
-  plain_key_idle: "ffffff"
-  plain_key_pressed: "b2b2b2"
+  plain_key_idle_1: "#ffffff"
+  plain_key_idle_2: "#fff8d9"
+  plain_key_pressed_1: "#686964"
+  plain_key_pressed_2: "#929292"
+  plain_key_3d_effect: "#828282"
 
 channels:
 
   # Fallback if channel not set!
   default:
-    plain: "dddddd"
-    sharp: "ffffff"
-    border: "000000"
+    plain_1: "#dddddd"
+    plain_2: "#dddddd"
+
+    sharp_1: "#ffffff"
+    sharp_2: "#ffffff"
+    
+    border: "#ffffff"
 
   0: # Orange / yellowish
-    plain: "ffcc00"
-    sharp: "ff9d00"
-    border: "000000"
+    plain_1: "#ffcc00"
+    plain_2: "#82ff88"
+
+    sharp_1: "#ff9d00"
+    sharp_2: "#63ff6b"
+    
+    border: "#ff9d00"
 
   1: # Green
-    plain: "00ff0d"
-    sharp: "00a608"
-    border: "000000"
+    plain_1: "#00ff0d"
+    plain_2: "#9854ff"
+    
+    sharp_1: "#00a608"
+    sharp_2: "#ffb642"
+
+    border: "#00a608"
 
   2: # Blue
-    plain: "6600ff"
-    sharp: "39008f"
-    border: "000000"
+    plain_1: "#6600ff"
+    sharp_2: "#c25353"
+
+    sharp_1: "#39008f"
+    plain_2: "#ff7373"
+
+    border: "#39008f"
 
   3: # Red
-    plain: "ff3232"
-    sharp: "993232"
-    border: "000000"
+    plain_1: "#ff3232"
+    sharp_2: "#9147ff"
 
-  4:
-    plain: "00fffb"
-    sharp: "00b5b2"
-    border: "000000"
+    sharp_1: "#993232"
+    plain_2: "#ffe270"
 
-  5:
-    plain: "ff006f"
-    sharp: "a10046"
-    border: "000000"
+    border: "#993232"
 
-  6:
-    plain: "aaff00"
-    sharp: "75b000"
-    border: "000000"
-
-  7:
-    plain: "e1ff00"
-    sharp: "a9bf00"
-    border: "000000"
-
-  8:
-    plain: "ff3300"
-    sharp: "a82200"
-    border: "000000"
-
-  9:
-    plain: "00ff91"
-    sharp: "00b567"
-    border: "000000"
-
-  10:
-    plain: "ff00aa"
-    sharp: "c40083"
-    border: "000000"
-
-  11:
-    plain: "c800ff"
-    sharp: "8e00b5"
-    border: "000000"
-
-  12:
-    plain: "00ff4c"
-    sharp: "00c93c"
-    border: "000000"
-
-  13:
-    plain: "ff8a8a"
-    sharp: "bf6767"
-    border: "000000"
-
-  14:
-    plain: "ffde7d"
-    sharp: "c4aa5e"
-    border: "000000"
-
-  15:
-    plain: "85ebff"
-    sharp: "5ca7b5"
-    border: "000000"
-
-  16:
-    plain: "ff7aa4"
-    sharp: "bd5978"
-    border: "000000"
+  # TODO: until 16 channels

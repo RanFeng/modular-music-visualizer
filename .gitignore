@@ -35,19 +35,12 @@ src/mmv/release
 src/mmv/mmvshader/glsl/st
 
 src/mmv/data/last_session_info.toml
-src/mmv/fragment
-src/mmv/mmvshader/pyglslrender.py
-src/mmv/mmvshader/glsl/experiment*
-src/mmv/mmvshader/runtime
-
-src/mmv/mmvshader/data
-src/mmv/mmvshader/fragment
-src/mmv/mmvshader/glsl/mpv/wip*
-src/mmv/mmvshader/shortexperiment
+src/mmv/mmvshader/shady
 
 # # Tremx logos Yeah this is my identity, you should use yours here :)
 src/mmvskia/assets/tremx_assets
 tremx*
+___*
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 

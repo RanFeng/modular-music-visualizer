@@ -2,7 +2,7 @@
 //                                 GPL v3 License                                
 // ===============================================================================
 //
-// Copyright (c) 2020,
+// Copyright (c) 2020 - 2021,
 //   - Tremeschin < https://tremeschin.gitlab.io > 
 //
 // ===============================================================================
@@ -34,7 +34,7 @@ float rand(float n){return fract(sin(n) * 43758.5453123);}
 vec4 mmv_blit_image(
         in vec4 canvas,     // Return this if out of bounds and repeat = false
         in sampler2D image, // The texture
-        in vec3 imagesize,  // As Shady adds {mapping}Size for the ratios, give those
+        in vec2 image_resolution,  // As Shady adds {mapping}Size for the ratios, give those
         in vec2 uv,         // UV we're getting (usually the layer's uv)
         in vec2 anchor,     // Anchor the rotation on the screen in some point
         in vec2 shift,      // Shift the image (for example vec2(0.5, 0.5) will rotate around the center)
@@ -44,8 +44,8 @@ vec4 mmv_blit_image(
     {
     
     // Image ratios
-    float image_ratio_x = imagesize.x / imagesize.y;
-    float image_ratio_y = imagesize.y / imagesize.x;
+    float image_ratio_x = image_resolution.x / image_resolution.y;
+    float image_ratio_y = image_resolution.y / image_resolution.x;
 
     // Scale matrix
     mat2 scale_mateix = mat2(
@@ -62,7 +62,7 @@ vec4 mmv_blit_image(
     );
 
     // The rotated, scaled and anchored, flipped and shifted UV coordinate to get this sampler2D texture
-    vec2 get_image_uv = (rotation_matrix * scale_mateix * (uv + anchor) * vec2(1.0, -1.0)) + shift;
+    vec2 get_image_uv = (rotation_matrix * scale_mateix * (uv - anchor)) + shift;
 
     // If not repeat, check if any uv is out of bounds
     if (!repeat) {
@@ -76,16 +76,16 @@ vec4 mmv_blit_image(
     float center_intensity = 5.0;
 
     // Get the texture (raw pixel, the center, non anti aliased)
-    vec4 imagepixel = texture2D(image, get_image_uv);
+    vec4 imagepixel = texture(image, get_image_uv);
     imagepixel *= center_intensity;
 
     // // Multi sample config
 
     // Distance of the uv texture on this pixel to averate out stuff
-    float lookup = (((1/iResolution.x) + (1/iResolution.y))/2.0) * 2.0;
+    float lookup = (((1 / mmv_resolution.x) + (1 / mmv_resolution.y))/2.0) * 2.0;
 
     // How many random pixels around to average
-    float many = 20;
+    float many = 1;
 
     // Constant
     float tau = 3.1415*2;
@@ -98,7 +98,7 @@ vec4 mmv_blit_image(
     for (float i = 0.0; i < tau; i += tau / many) {{
         // A random radially point
         get_lookuped = get_image_uv + (vec2(rand(i), rand(i+1)) * lookup);
-        multisampled += texture2D(image, get_lookuped);
+        multisampled += texture(image, get_lookuped);
     }}
 
     imagepixel = multisampled / (many + center_intensity);

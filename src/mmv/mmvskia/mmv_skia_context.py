@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 import logging
 import sys
 import os
@@ -36,9 +36,9 @@ import os
 # that class also changes some configurations here, this is motly
 # shared stuff across files and it's a bit hard to keep track of them all
 class MMVContext:
-    def __init__(self, mmv_skia_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmv_skia_main) -> None:
         debug_prefix = "[MMVContext.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         self.mmv_skia_main = mmv_skia_main
 
         # Files, info

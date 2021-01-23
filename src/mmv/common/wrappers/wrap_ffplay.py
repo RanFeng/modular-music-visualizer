@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 import mmv.common.cmn_any_logger
 from PIL import Image
 import numpy as np
@@ -47,11 +47,9 @@ class FFplayWrapper:
         framerate: int,
         vflip = False,
         quiet = True,
-        depth = LOG_NO_DEPTH,
     ) -> None:
 
         debug_prefix = "[FFplayWrapper.configure_pipe_images_to_video]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Add the rest of the command
         self.command = [
@@ -69,15 +67,13 @@ class FFplayWrapper:
         if quiet:
             self.command += ["-loglevel", "panic", "-hide_banner"]
 
-    
-
         # Log the command for generating final video
-        logging.info(f"{depth}{debug_prefix} FFplay command is: {self.command}")
+        logging.info(f"{debug_prefix} FFplay command is: {self.command}")
       
-    def pipe_images_to_video(self):
+    def pipe_images_to_video(self, *args, **kwargs):
         pass
 
-    def pipe_writer_loop(self):
+    def pipe_writer_loop(self, *args, **kwargs):
         pass
     
     def write_to_pipe(self, index, image):
@@ -86,11 +82,10 @@ class FFplayWrapper:
     def close_pipe(self):
         self.subprocess.stdin.close()
 
-    def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE, depth = LOG_NO_DEPTH):
+    def start(self, stdin = subprocess.PIPE, stdout = subprocess.PIPE):
         debug_prefix = "[FFplayWrapper.start]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
-        logging.info(f"{depth}{debug_prefix} Starting FFplay pipe subprocess with command {self.command}")
+        logging.info(f"{debug_prefix} Starting FFplay pipe subprocess with command {self.command}")
 
         # Create a subprocess in the background
         self.subprocess = subprocess.Popen(

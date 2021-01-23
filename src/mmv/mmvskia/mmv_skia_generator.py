@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -27,26 +27,25 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.mmvskia.generators.mmv_skia_particle_generator import MMVSkiaParticleGenerator
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
 import logging
 
 
 class MMVSkiaGenerator:
-    def __init__(self, mmvskia_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmvskia_main) -> None:
         debug_prefix = "[MMVSkiaGenerator.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         self.mmvskia_main = mmvskia_main
         self.preludec = self.mmvskia_main.mmvskia_interface.prelude["mmvgenerator"]
  
         # Get an unique identifier for this MMVSkiaImage object
         self.identifier = self.mmvskia_main.utils.get_unique_id(
-            purpose = "MMVSkiaImage object", depth = ndepth,
+            purpose = "MMVSkiaImage object",
             silent = self.preludec["log_get_unique_id"]
         )
 
         # Log the creation of this class
         if self.preludec["log_creation"]:
-            logging.info(f"{depth}{debug_prefix} [{self.identifier}] Created new MMVSkiaGenerator object, getting unique identifier for it")
+            logging.info(f"{debug_prefix} [{self.identifier}] Created new MMVSkiaGenerator object, getting unique identifier for it")
 
         # Start with empty generator object
         self.generator = None
@@ -56,13 +55,12 @@ class MMVSkiaGenerator:
         return self.generator.next()
 
     # Set a particle generator object
-    def particle_generator(self, depth = LOG_NO_DEPTH, **kwargs) -> None:
+    def particle_generator(self, **kwargs) -> None:
         debug_prefix = "[MMVSkiaGenerator.particle_generator]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
         if self.preludec["particle_generator"]:
-            logging.info(f"{depth}{debug_prefix} [{self.identifier}] Setting this generator object to MMVSkiaParticleGenerator with kwargs: {kwargs}")
+            logging.info(f"{debug_prefix} [{self.identifier}] Setting this generator object to MMVSkiaParticleGenerator with kwargs: {kwargs}")
 
         # Set this generator to a MMVSkiaParticleGenerator
-        self.generator = MMVSkiaParticleGenerator(self.mmvskia_main, depth = ndepth, **kwargs)
+        self.generator = MMVSkiaParticleGenerator(self.mmvskia_main, **kwargs)

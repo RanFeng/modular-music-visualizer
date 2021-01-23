@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -27,7 +27,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from mmv.mmvskia.mmv_skia_modifiers import MMVSkiaModifierMode, MMVSkiaModifierLine, MMVSkiaModifierPoint, MMVSkiaModifierShake, MMVSkiaModifierFade
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
 from mmv.mmvskia.mmv_skia_interpolation import MMVSkiaInterpolation
 from mmv.mmvskia.mmv_skia_image import MMVSkiaImage
 from mmv.common.cmn_utils import Utils
@@ -38,7 +37,7 @@ import os
 
 
 class MMVSkiaParticleGenerator:
-    def __init__(self, mmvskia_main, depth = LOG_NO_DEPTH, **kwargs):
+    def __init__(self, mmvskia_main, **kwargs):
         debug_prefix = "[MMVSkiaParticleGenerator.__init__]"
         self.mmvskia_main = mmvskia_main
         self.type = "mmvgenerator"

@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH
+
 from mmv.mmvskia.pyskt.pyskt_backend import SkiaNoWindowBackend
 from mmv.mmvskia.mmv_skia_animation import MMVSkiaAnimation
 from mmv.common.cmn_coordinates import PolarCoordinates
@@ -55,62 +55,60 @@ class MMVSkiaMain:
         self.prelude = self.mmvskia_interface.prelude
         
     # Creates classes and send to Core
-    def setup(self, depth = LOG_NO_DEPTH) -> None:
+    def setup(self) -> None:
         debug_prefix = "[MMVSkiaMain.setup]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         self.utils = Utils()
 
-        logging.info(f"{depth}{debug_prefix} Creating MMVContext() class")
-        self.context = MMVContext(mmv_skia_main = self, depth = ndepth)
+        logging.info(f"{debug_prefix} Creating MMVContext() class")
+        self.context = MMVContext(mmv_skia_main = self)
 
-        logging.info(f"{depth}{debug_prefix} Creating SkiaNoWindowBackend() class")
+        logging.info(f"{debug_prefix} Creating SkiaNoWindowBackend() class")
         self.skia = SkiaNoWindowBackend()
 
-        logging.info(f"{depth}{debug_prefix} Creating Functions() class")
+        logging.info(f"{debug_prefix} Creating Functions() class")
         self.functions = Functions()
 
-        logging.info(f"{depth}{debug_prefix} Creating Interpolation() class")
+        logging.info(f"{debug_prefix} Creating Interpolation() class")
         self.interpolation = Interpolation()
 
-        logging.info(f"{depth}{debug_prefix} Creating PolarCoordinates() class")
+        logging.info(f"{debug_prefix} Creating PolarCoordinates() class")
         self.polar_coordinates = PolarCoordinates()
 
-        logging.info(f"{depth}{debug_prefix} Creating Canvas() class")
-        self.canvas = MMVSkiaImage(mmvskia_main = self, depth = ndepth)
+        logging.info(f"{debug_prefix} Creating Canvas() class")
+        self.canvas = MMVSkiaImage(mmvskia_main = self)
 
-        logging.info(f"{depth}{debug_prefix} Creating Fourier() class")
+        logging.info(f"{debug_prefix} Creating Fourier() class")
         self.fourier = Fourier()
 
         # The user must explicitly set and override this, mostly for compatibility
         # and code cleanup reasons.
         self.pipe_video_to = None
 
-        logging.info(f"{depth}{debug_prefix} Creating AudioFile() class")
+        logging.info(f"{debug_prefix} Creating AudioFile() class")
         self.audio = AudioFile()
 
-        logging.info(f"{depth}{debug_prefix} Creating AudioProcessing() class")
+        logging.info(f"{debug_prefix} Creating AudioProcessing() class")
         self.audio_processing = AudioProcessing()
 
-        logging.info(f"{depth}{debug_prefix} Creating MMVSkiaAnimation() class")
-        self.mmv_skia_animation = MMVSkiaAnimation(mmv_skia_main = self, depth = ndepth)
+        logging.info(f"{debug_prefix} Creating MMVSkiaAnimation() class")
+        self.mmv_skia_animation = MMVSkiaAnimation(mmv_skia_main = self)
     
-        logging.info(f"{depth}{debug_prefix} Creating MMVSkiaCore() class")
-        self.core = MMVSkiaCore(mmvskia_main = self, depth = ndepth)
+        logging.info(f"{debug_prefix} Creating MMVSkiaCore() class")
+        self.core = MMVSkiaCore(mmvskia_main = self)
 
     # Execute the program
-    def run(self, depth = LOG_NO_DEPTH) -> None:
+    def run(self) -> None:
         debug_prefix = "[MMVSkiaMain.run]"
-        ndepth = depth + LOG_NEXT_DEPTH
         
         try:
             # import cProfile
             # p = cProfile.Profile()
             # p.enable()
-            logging.info(f"{depth}{debug_prefix} Executing MMVSkiaCore.run()")
-            self.core.run(depth = ndepth)
+            logging.info(f"{debug_prefix} Executing MMVSkiaCore.run()")
+            self.core.run()
             
-            logging.info(f"{depth}{debug_prefix} Finished, terminating GLFW")
+            logging.info(f"{debug_prefix} Finished, terminating GLFW")
             self.skia.terminate_glfw()
             # p.disable()
             # p.dump_stats("res.prof")
@@ -126,5 +124,5 @@ class MMVSkiaMain:
         while not self.pipe_video_to.stop_piping:
             time.sleep(0.05)
 
-        logging.info(f"{depth}{debug_prefix} Quitting Python")
+        logging.info(f"{debug_prefix} Quitting Python")
         sys.exit(0)

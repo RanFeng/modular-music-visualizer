@@ -3,7 +3,7 @@
                                 GPL v3 License                                
 ===============================================================================
 
-Copyright (c) 2020,
+Copyright (c) 2020 - 2021,
   - Tremeschin < https://tremeschin.gitlab.io > 
 
 ===============================================================================
@@ -26,7 +26,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 """
 
-from mmv.common.cmn_constants import LOG_NEXT_DEPTH, LOG_NO_DEPTH, LOG_SEPARATOR, STEP_SEPARATOR
+from mmv.common.cmn_constants import STEP_SEPARATOR
 import numpy as np
 import threading
 import logging
@@ -38,60 +38,59 @@ import os
 
 
 class MMVSkiaCore:
-    def __init__(self, mmvskia_main, depth = LOG_NO_DEPTH) -> None:
+    def __init__(self, mmvskia_main) -> None:
         debug_prefix = "[MMVSkiaCore.__init__]"
-        ndepth = depth + LOG_NEXT_DEPTH
+
         self.mmvskia_main = mmvskia_main
         self.prelude = self.mmvskia_main.prelude
         self.preludec = self.prelude["mmvcore"]
 
         # Log creation
         if self.preludec["log_creation"]:
-            logging.info(f"{depth}{debug_prefix} Created MMVSkiaCore()")
+            logging.info(f"{debug_prefix} Created MMVSkiaCore()")
 
     # Execute MMV, core loop
-    def run(self, depth = LOG_NO_DEPTH) -> None:
+    def run(self) -> None:
         debug_prefix = "[MMVSkiaCore.run]"
-        ndepth = depth + LOG_NEXT_DEPTH
 
         # Log action
-        logging.info(f"{depth}{debug_prefix} Executing MMVSkiaCore.run()")
+        logging.info(f"{debug_prefix} Executing MMVSkiaCore.run()")
 
         # # Save info so we can utilize on post processing or somewhere else
 
         last_session_info_file = self.mmvskia_main.mmvskia_interface.top_level_interace.last_session_info_file
-        logging.info(f"{depth}{debug_prefix} Saving partial session info to last_session_info file at [{last_session_info_file}]")
+        logging.info(f"{debug_prefix} Saving partial session info to last_session_info file at [{last_session_info_file}]")
 
         # Quit if code flow says so
         if self.prelude["flow"]["stop_at_mmv_skia_core_run"]:
-            logging.critical(f"{ndepth}{debug_prefix} Not continuing because stop_at_mmv_skia_core_run key on prelude.toml is True")
+            logging.critical(f"{debug_prefix} Not continuing because stop_at_mmv_skia_core_run key on prelude.toml is True")
             sys.exit(0)
 
         # Don't write any videos, just process the audio (useful for debugging)
         ONLY_PROCESS_AUDIO = self.prelude["flow"]["only_process_audio"]
-        logging.info(f"{depth}{debug_prefix} Only process audio: [{ONLY_PROCESS_AUDIO}]")
+        logging.info(f"{debug_prefix} Only process audio: [{ONLY_PROCESS_AUDIO}]")
 
         # Read the audio and start pipe_video_to pipe
-        logging.info(f"{depth}{debug_prefix} Read audio file")
-        self.mmvskia_main.audio.read(path = self.mmvskia_main.context.input_audio_file, depth = ndepth)
+        logging.info(f"{debug_prefix} Read audio file")
+        self.mmvskia_main.audio.read(path = self.mmvskia_main.context.input_audio_file)
         
         # How many steps is the audio duration times the frames per second
         self.mmvskia_main.context.total_steps = int(self.mmvskia_main.audio.duration * self.mmvskia_main.context.fps)
-        logging.info(f"{depth}{debug_prefix} Total steps: {self.mmvskia_main.context.total_steps}")
+        logging.info(f"{debug_prefix} Total steps: {self.mmvskia_main.context.total_steps}")
 
         # Update info that might have been changed by the user
-        logging.info(f"{depth}{debug_prefix} Update Context bases")
+        logging.info(f"{debug_prefix} Update Context bases")
         self.mmvskia_main.context.update_biases()
 
         # Create the pipe write thread
         if not ONLY_PROCESS_AUDIO:
            
             # Start video pipe
-            logging.info(f"{depth}{debug_prefix} Starting pipe_video_to process")
+            logging.info(f"{debug_prefix} Starting pipe_video_to process")
             self.mmvskia_main.pipe_video_to.start()
 
             # Create pipe writer thread
-            logging.info(f"{depth}{debug_prefix} Creating pipe writer thread")
+            logging.info(f"{debug_prefix} Creating pipe writer thread")
             self.pipe_writer_loop_thread = threading.Thread(
                 target = self.mmvskia_main.pipe_video_to.pipe_writer_loop,
                 args = (
@@ -104,11 +103,11 @@ class MMVSkiaCore:
             )
 
             # Start the thread to write images onto pipe_video_to
-            logging.info(f"{depth}{debug_prefix} Starting pipe writer thread")
+            logging.info(f"{debug_prefix} Starting pipe writer thread")
             self.pipe_writer_loop_thread.start()
 
             # Init Skia
-            logging.info(f"{depth}{debug_prefix} Init Skia")
+            logging.info(f"{debug_prefix} Init Skia")
             self.mmvskia_main.skia.init(
                 width = self.mmvskia_main.context.width,
                 height = self.mmvskia_main.context.height,
@@ -149,8 +148,8 @@ class MMVSkiaCore:
 
         # # Main routine
 
-        logging.info(f"{depth}{debug_prefix} Start main routine")
-        logging.info(f"{depth}{debug_prefix} Video will be saved in [{self.mmvskia_main.context.output_video}]")
+        logging.info(f"{debug_prefix} Start main routine")
+        logging.info(f"{debug_prefix} Video will be saved in [{self.mmvskia_main.context.output_video}]")
 
         # Iterate over all steps
         for step in range(0, self.mmvskia_main.context.total_steps):
@@ -158,7 +157,7 @@ class MMVSkiaCore:
             # Log current step, next iteration
             if LOG_STEP:
                 logging.debug(STEP_SEPARATOR)
-                logging.debug(f"{depth}{debug_prefix} Next step:")
+                logging.debug(f"{debug_prefix} Next step:")
 
             # The "raw" frame index we're at
             global_frame_index = step
@@ -174,7 +173,7 @@ class MMVSkiaCore:
 
             # Log offset step
             if LOG_OFFSETTED_STEP:
-                logging.debug(f"{depth}{debug_prefix} Offsetted step by [{self.mmvskia_main.context.offset_audio_before_in_many_steps}] is [{self.this_step}]")
+                logging.debug(f"{debug_prefix} Offsetted step by [{self.mmvskia_main.context.offset_audio_before_in_many_steps}] is [{self.this_step}]")
 
             # The current time in seconds we're going to slice the audio based on its sample rate
             # If we offset to the opposite way, the starting point can be negative hence the max function.
@@ -230,7 +229,7 @@ class MMVSkiaCore:
         
             # Log modulators
             if LOG_MODULATORS:
-                logging.debug(f"{depth}{debug_prefix} Modulators on this step: [{self.modulators}]")
+                logging.debug(f"{debug_prefix} Modulators on this step: [{self.modulators}]")
 
             # # # [ Next steps ] # # #
 
@@ -239,22 +238,22 @@ class MMVSkiaCore:
                 
                 # Reset skia canvas
                 if LOG_NEXT_STEPS:
-                    logging.debug(f"{depth}{debug_prefix} Reset skia canvas")
+                    logging.debug(f"{debug_prefix} Reset skia canvas")
                 self.mmvskia_main.skia.reset_canvas()
 
                 # Process next animation with audio info and the step count to process on
                 if LOG_NEXT_STEPS:
-                    logging.debug(f"{depth}{debug_prefix} Call MMVSkiaAnimation.next()")
+                    logging.debug(f"{debug_prefix} Call MMVSkiaAnimation.next()")
                 self.mmvskia_main.mmv_skia_animation.next()
 
                 # Next image to pipe
                 if LOG_NEXT_STEPS:
-                    logging.debug(f"{depth}{debug_prefix} Get next image from canvas array")
+                    logging.debug(f"{debug_prefix} Get next image from canvas array")
                 next_image = self.mmvskia_main.skia.canvas_array()
 
                 # Save current canvas's Frame to the final video, the pipe writer thread will actually pipe it
                 if LOG_NEXT_STEPS:
-                    logging.debug(f"{depth}{debug_prefix} Write image to pipe_video_to pipe index [{global_frame_index}]")
+                    logging.debug(f"{debug_prefix} Write image to pipe_video_to pipe index [{global_frame_index}]")
                 self.mmvskia_main.pipe_video_to.write_to_pipe(global_frame_index, next_image)
             
             else:  # QOL print what is happening
@@ -264,7 +263,7 @@ class MMVSkiaCore:
         if ONLY_PROCESS_AUDIO:
             self.mmvskia_main.skia.terminate_glfw()
         else:
-            logging.info(f"{depth}{debug_prefix} Call to close pipe, let it wait until it's done")
+            logging.info(f"{debug_prefix} Call to close pipe, let it wait until it's done")
             self.mmvskia_main.pipe_video_to.close_pipe()
 
         # Update the TOML with the new data
