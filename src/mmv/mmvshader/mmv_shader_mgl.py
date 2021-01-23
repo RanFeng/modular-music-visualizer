@@ -216,6 +216,10 @@ class MMVShaderMGL:
                 # We need an target render size
                 assert (width != '') and (height != ''), "Width or height shouldn't be null, set WxH on pragma map with ;512x512"
 
+                # Convert to int the width and height
+                width = int(width)
+                height = int(height)
+
                 # Image loader
                 if loader == "image":
                     # Load the image, get width and height for the texture size
@@ -261,8 +265,11 @@ class MMVShaderMGL:
                     # Get one VideoCapture
                     video = cv2.VideoCapture(value)
 
+                    # Create a RGB texture for the video
+                    texture = self.gl_context.texture((width, height), 3)
+
                     # Assign the name, type and texture to the textures dictionary
-                    self.textures[len(self.textures.keys()) + 1] = [name, "video", video]
+                    self.textures[len(self.textures.keys()) + 1] = [name, "video", texture, video]
                     
                 # Add the texture uniform values
                 marker = "///add_uniform"
@@ -281,7 +288,7 @@ class MMVShaderMGL:
 
         # Get #pragma includes
 
-        # Simple rexed and get every match with findall
+        # Simple regex and get every match with findall
         regex = r"#pragma include ([\w/. -]+)"
         found = re.findall(regex, fragment_shader)
 
@@ -361,29 +368,31 @@ class MMVShaderMGL:
             try:
                 # Read the next frame of the video
                 if loader == "video":
-                    ok, frame = tex_obj.read()
+
+                    # We'll only have a fourth element that is video if loader is video
+                    video = texture_info[3]
+                    
+                    ok, frame = video.read()
 
                     # Can't read, probably out of frames?
-                    if not ok:  # cry
+                    if not ok: 
 
-                        #reset to frame 0
-                        tex_obj.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        # Reset to frame 0
+                        video.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
                         # Read again
-                        ok, frame = tex_obj.read()
+                        ok, frame = video.read()
                     
-                    # Flip the image TODO: flip in GLSL by inverting uv?
-                    # frame = cv2.flip(frame, 0)
-                    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_texture = self.gl_context.texture((frame.shape[1], frame.shape[0]), 3, frame)
-                else:
-                    frame_texture = tex_obj
+                    # Flip the image TODO: flip in GLSL by inverting uv? Also interpret BGR as RGB?
+                    frame = cv2.flip(frame, 0)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    tex_obj.write(frame)
 
                 # Set the location we'll expect this texture
                 self.program[name] = location
                 
                 # Use it
-                frame_texture.use(location = location)
+                tex_obj.use(location = location)
             
             # Texture wasn't used, should error out on self.program[name]
             except KeyError:
