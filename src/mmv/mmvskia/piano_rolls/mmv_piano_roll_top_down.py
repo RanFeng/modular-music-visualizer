@@ -100,8 +100,9 @@ class MMVSkiaPianoRollTopDown:
         print("Add key by index: {", end = "", flush = True)
 
         # For each key index, with a bleed (extra keys) counting up and down from the minimum / maximum key index
-        for key_index in range(min_note - self.config["bleed"], max_note + self.config["bleed"]):
-        # for key_index in range(98):
+        # for key_index in range(min_note - self.config["bleed"], max_note + self.config["bleed"]):
+        # for key_index in range(33, 121):
+        for key_index in range(21, 109):
 
             # Create a PianoKey object and set its index
             next_key = PianoKey(self.mmvskia_main, self.vectorial, self)
@@ -189,12 +190,12 @@ class MMVSkiaPianoRollTopDown:
         # White keys
         for key_index in self.piano_keys.keys():
             if self.piano_keys[key_index].is_white:
-                self.piano_keys[key_index].draw(self.notes_playing)
+                self.piano_keys[key_index].draw(self.notes_playing, self.channels_playing)
 
         # Black keys
         for key_index in self.piano_keys.keys():
             if self.piano_keys[key_index].is_black:
-                self.piano_keys[key_index].draw(self.notes_playing)
+                self.piano_keys[key_index].draw(self.notes_playing, self.channels_playing)
     
     # Draw the markers IN BETWEEN TWO WHITE KEYS
     def draw_markers(self):
@@ -240,7 +241,8 @@ class MMVSkiaPianoRollTopDown:
         # Is a sharp key
         if "#" in name:
             width = self.semitone_width*0.5
-            color = skia.Color4f(*note_colors["sharp"], 1)
+            color = skia.Color4f(*note_colors["plain"], 1)
+            # color = skia.Color4f(*note_colors["sharp"], 1)
 
         # Plain key
         else:
@@ -270,7 +272,7 @@ class MMVSkiaPianoRollTopDown:
             # Style = skia.Paint.kFill_Style,
             # ImageFilter=skia.ImageFilters.DropShadow(3, 3, 5, 5, skia.ColorBLUE),
             # ImageFilter=skia.ImageFilters.DropShadow(1, 1, 3, 3, color),
-            # MaskFilter=skia.MaskFilter.MakeBlur(skia.kNormal_BlurStyle, 2.0),
+            # MaskFilter=skia.MaskFilter.MakeBlur(skia.kNormal_BlurStyle, 1.0),
             StrokeWidth = max(self.mmvskia_main.context.resolution_ratio_multiplier * 2, 1),
         )
         
@@ -351,6 +353,7 @@ class MMVSkiaPianoRollTopDown:
 
         # What notes are playing? So we draw a darker piano key
         self.notes_playing = []
+        self.channels_playing = []
 
         # For each channel of notes
         for channel in self.vectorial.midi.timestamps.keys():
@@ -385,6 +388,7 @@ class MMVSkiaPianoRollTopDown:
                         # Append to playing notes
                         if current_time_in_interval:
                             self.notes_playing.append(note)
+                            self.channels_playing.append(channel)
 
                         # Either way, draw the key
                         self.draw_note(
@@ -469,7 +473,7 @@ class PianoKey:
             self.is_black = False
 
     # Draw this key
-    def draw(self, notes_playing):
+    def draw(self, notes_playing, channels_playing=None):
 
         # If the note is black we leave a not filled spot on the bottom, this is the ratio of it
         away = (self.height * (0.33)) if self.is_black else 0
@@ -486,8 +490,14 @@ class PianoKey:
         self.active = self.note in notes_playing
 
         # Get the color based on if the note is active or not
-        color = self.color_active if self.active else self.color_idle
-
+        if self.active:
+            color = self.color_active
+            if channels_playing is not None:
+                note_index = notes_playing.index(self.note)
+                color = self.piano_roll.color_channels.get(channels_playing[note_index], 'pressed')
+                color = skia.Color4f(*color["plain"], 1)
+        else:
+            color = self.color_idle
         # Make the skia Paint and
         key_paint = skia.Paint(
             AntiAlias = True,

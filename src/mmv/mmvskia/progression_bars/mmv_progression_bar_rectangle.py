@@ -127,5 +127,7 @@ class MMVSkiaProgressionBarRectangle:
             )
             
             # Draw the border
-            self.mmv.skia.canvas.drawRect(border, paint)
+            border = skia.RRect(border, 17.0, 17.0)
+            # self.mmv.skia.canvas.drawRect(border, paint)
+            self.mmv.skia.canvas.drawRRect(border, paint)
 

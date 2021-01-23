@@ -48,6 +48,11 @@ channels:
     sharp: "ffffff"
     border: "000000"
 
+  pressed:
+    plain: "b2b2b2"
+    sharp: "000000"
+    border: "000000"
+
   0: # Orange / yellowish
     plain: "ffcc00"
     sharp: "ff9d00"

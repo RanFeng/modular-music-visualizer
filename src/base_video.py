@@ -286,7 +286,7 @@ if MODE == "music":
 # Piano Roll general configuration
 elif MODE == "piano_roll":
 
-    INPUT_MIDI  = THIS_FILE_DIR + "/assets/free_assets/piano_roll/canon.mid"
+    INPUT_MIDI  = THIS_FILE_DIR + "/assets/free_assets/piano_roll/locate.mid"
 
     # "auto" or "manual"
     #   auto: Downloads and uses musescore for converting midi -> audio
@@ -302,7 +302,7 @@ elif MODE == "piano_roll":
 
     # Manual config
     if AUDIO_OF_MIDI == "manual":
-        INPUT_AUDIO = THIS_FILE_DIR + "/assets/free_assets/piano_roll/canon.ogg"
+        INPUT_AUDIO = THIS_FILE_DIR + "/assets/free_assets/piano_roll/locate.ogg"
 
     # Automatic conversion, NOT IMPLEMENTED FOR WINDOWS
     elif AUDIO_OF_MIDI == "auto":
